@@ -1,7 +1,7 @@
 import './App.css'
 
 function App() {
-  return <>Hello!</>
+  return <><p className='p-24 text-amber-700'>Hello</p></>
 }
 
 export default App
