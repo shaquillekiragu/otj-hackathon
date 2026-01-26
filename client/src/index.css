@@ -1,15 +1,27 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  font-size: 1rem;
+}
 
-  color: #000000;
-  background-color: #f5f8ff;
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+h2 {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+button {
+  padding: 12px 24px;
+  background-color: #0055ff;
+  color: #e4edff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
 }
