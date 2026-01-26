@@ -1,1 +1,1 @@
-# otj-hackathon-backend
+# otj-hackathon
