@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { Description, TimeSheet } from './db';
 
 export type JournalInput = {
@@ -11,11 +10,11 @@ export type JournalInput = {
   tagIds?: string[];
 };
 
-export type ListJournalEntriesByUserInput = {
+export type UserIdInput = {
   userId: string;
 };
 
-export type GetJournalEntryByIdInput = {
+export type JournalIdInput = {
   id: string;
 };
 

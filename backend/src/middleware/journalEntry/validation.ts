@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '../utils/apiError';
-import { validateRequiredFields } from './utils/validateRequiredFields';
+import { ApiError } from '../../utils/apiError';
+import { validateRequiredFields } from '../utils/validateRequiredFields';
 
-export const validateJournalEntry = (
+export const validateJournalEntryRequest = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -24,28 +24,28 @@ export const validateJournalEntry = (
   }
 };
 
-export const validateListJournalEntriesByUser = (
+export const validateUserIdInBody = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   if (!req.body.userId) {
     return res.status(400).json({
-      message: `Failed to fetch all journal entries - missing userId: ${req.body.userId}`,
+      message: `Failed to fetch all journal entries - missing userId in request body: ${req.body.userId}`,
     });
   }
 
   next();
 };
 
-export const validateGetJournalEntry = (
+export const validateJournalIdInBody = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.params.id) {
+  if (!req.body.id) {
     return res.status(400).json({
-      message: `Failed to fetch journal entry - missing journalId: ${req.params.id}`,
+      message: `Failed to fetch journal entry - missing journalId in request body: ${req.body.id}`,
     });
   }
 
