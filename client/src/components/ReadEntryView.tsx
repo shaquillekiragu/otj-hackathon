@@ -1,8 +1,17 @@
 import TimesheetSection from './TimesheetSection'
+import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
+import { PLACEHOLDER_TAGS } from '../types/journal'
 
 function ReadEntryView() {
   const timesheetProps = useTimesheetManagement()
+
+  // Placeholder: selected tags for this entry (will come from API)
+  const selectedTags = [
+    PLACEHOLDER_TAGS[0],
+    PLACEHOLDER_TAGS[2],
+    PLACEHOLDER_TAGS[4]
+  ]
 
   const sections = [
     {
@@ -40,6 +49,8 @@ function ReadEntryView() {
       ))}
 
       <TimesheetSection {...timesheetProps} />
+
+      <TagSection selectedTags={selectedTags} mode="read" />
     </>
   )
 }
