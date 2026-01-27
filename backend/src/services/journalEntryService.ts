@@ -6,11 +6,11 @@ import {
   TagDocument,
   TimeSheet,
 } from '../types/db';
+import { syncUserTags } from './tagService';
 import { getPagination } from '../utils/pagination';
 import { ApiError } from '../utils/apiError';
-import { JournalInput } from '../types/payload';
 import { normaliseTagsForUser } from './utils/normaliseTagsForUsers';
-import { syncUserTags } from './tagService';
+import { JournalInput } from '../types/payload';
 
 export const createJournalEntryService = async (createInput: JournalInput) => {
   const {
@@ -50,36 +50,6 @@ export const createJournalEntryService = async (createInput: JournalInput) => {
   return { _id: result.insertedId, ...newJournalEntry };
 };
 
-export const listJournalEntriesByUserIdService = async (
-  userId: string,
-  page?: string,
-  limit?: string,
-) => {
-  if (!userId) throw new ApiError('Missing userId', 400);
-
-  const { page: pageNum, limit: limitNum, skip } = getPagination(page, limit);
-
-  const query = { userId: new ObjectId(userId) };
-
-  const totalEntries = await journalEntriesCollection().countDocuments(query);
-  const totalPages = Math.ceil(totalEntries / limitNum);
-
-  const entries = await journalEntriesCollection()
-    .find(query)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limitNum)
-    .toArray();
-
-  return {
-    entries,
-    page: pageNum,
-    limit: limitNum,
-    totalPages,
-    totalEntries,
-  };
-};
-
 export const getJournalEntryByIdService = async (
   journalId: string,
   page?: string,
@@ -111,6 +81,36 @@ export const getJournalEntryByIdService = async (
     limit: limitNum,
     totalPages,
     totalTimesheets,
+  };
+};
+
+export const listJournalEntriesByUserIdService = async (
+  userId: string,
+  page?: string,
+  limit?: string,
+) => {
+  if (!userId) throw new ApiError('Missing userId', 400);
+
+  const { page: pageNum, limit: limitNum, skip } = getPagination(page, limit);
+
+  const query = { userId: new ObjectId(userId) };
+
+  const totalEntries = await journalEntriesCollection().countDocuments(query);
+  const totalPages = Math.ceil(totalEntries / limitNum);
+
+  const entries = await journalEntriesCollection()
+    .find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNum)
+    .toArray();
+
+  return {
+    entries,
+    page: pageNum,
+    limit: limitNum,
+    totalPages,
+    totalEntries,
   };
 };
 

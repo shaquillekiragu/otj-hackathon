@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { handleError } from './utils/handleError';
 import {
   getTagsByUserService,
   updateUserTagService,
   deleteUserTagService,
 } from '../services/tagService';
+import { handleError } from './utils/handleError';
 import { TagInput } from '../types/payload';
 
 export const getTagsByUser = async (req: Request, res: Response) => {

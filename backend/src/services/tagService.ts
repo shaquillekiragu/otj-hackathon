@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
-import { ApiError } from '../utils/apiError';
-import { TagDocument } from '../types/db';
 import { TagInput } from '../types/payload';
+import { TagDocument } from '../types/db';
 import { journalEntriesCollection, tagsCollection } from '../db';
+import { ApiError } from '../utils/apiError';
 import { getUserTags } from './utils/getUserTags';
 import { addMissingTags } from './utils/addMissingTags';
 

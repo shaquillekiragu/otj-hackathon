@@ -8,6 +8,7 @@ export const handleError = (res: Response, error: unknown, message: string) => {
       message: error.message,
     });
   }
+
   console.error(error);
   res.status(500).json({ success: false, message });
 };

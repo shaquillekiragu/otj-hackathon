@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import {
   createJournalEntryService,
-  listJournalEntriesByUserIdService,
   getJournalEntryByIdService,
+  listJournalEntriesByUserIdService,
   updateJournalEntryService,
   deleteJournalEntryService,
 } from '../services/journalEntryService';
@@ -14,24 +14,6 @@ export const createJournalEntry = async (req: Request, res: Response) => {
     res.status(201).json({ success: true, journalEntry });
   } catch (error) {
     handleError(res, error, 'Failed to create journal entry');
-  }
-};
-
-export const listJournalEntriesByUser = async (req: Request, res: Response) => {
-  try {
-    const { page, limit } = req.query;
-    const journalEntries = await listJournalEntriesByUserIdService(
-      req.body.userId,
-      page as string,
-      limit as string,
-    );
-    res.status(200).json({ success: true, journalEntries });
-  } catch (error) {
-    handleError(
-      res,
-      error,
-      `Failed to list journal entries for user: ${req.query.userId}`,
-    );
   }
 };
 
@@ -51,6 +33,24 @@ export const getJournalEntry = async (req: Request, res: Response) => {
       res,
       error,
       `Failed to get journal entry for id: ${req.params.id}`,
+    );
+  }
+};
+
+export const listJournalEntriesByUser = async (req: Request, res: Response) => {
+  try {
+    const { page, limit } = req.query;
+    const journalEntries = await listJournalEntriesByUserIdService(
+      req.body.userId,
+      page as string,
+      limit as string,
+    );
+    res.status(200).json({ success: true, journalEntries });
+  } catch (error) {
+    handleError(
+      res,
+      error,
+      `Failed to list journal entries for user: ${req.query.userId}`,
     );
   }
 };

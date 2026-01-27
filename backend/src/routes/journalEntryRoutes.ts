@@ -1,15 +1,14 @@
 import express from 'express';
 import {
   createJournalEntry,
-  listJournalEntriesByUser,
   getJournalEntry,
+  listJournalEntriesByUser,
   updateJournalEntry,
   deleteJournalEntry,
 } from '../controllers/journalEntryController';
 import {
   validateJournalEntryRequest,
   validateUserIdInBody,
-  validateJournalIdInBody,
   validateJournalIdInParams,
   validatePaginationParams,
 } from '../middleware/journalEntry/validation';
