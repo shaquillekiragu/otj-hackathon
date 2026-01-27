@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import JournalTimeline from './components/JournalTimeline'
 import SearchFilters from './components/SearchFilters'
+import Modal from './components/Modal'
 
 function App() {
+  const [showModal, setShowModal] = useState(true)
+
   const placeholderEntries = [
     {
       id: 1,
@@ -23,19 +27,24 @@ function App() {
     }
   ]
   return (
-    <div className="flex flex-col items-center justify-start p-4 gap-4">
-      <div className="w-full">
-        <h1>Log Off-the-Job Activities</h1>
-        <h2>
-          Description of what this page is for - update later!
-          ********************
-        </h2>
-        <h2>You are currently 3 hours ahead of expectations.</h2>
+    <>
+      {showModal && <Modal onClose={() => setShowModal(false)} />}
+      <div className="flex flex-col items-center justify-start p-4 gap-4">
+        <div className="w-full">
+          <h1>Log Off-the-Job Activities</h1>
+          <h2>
+            Description of what this page is for - update later!
+            ********************
+          </h2>
+          <h2>You are currently 3 hours ahead of expectations.</h2>
+        </div>
+        <button className="px-12!" onClick={() => setShowModal(true)}>
+          Log OTJ
+        </button>
+        <SearchFilters />
+        <JournalTimeline entries={placeholderEntries} />
       </div>
-      <button className="px-12!">Log OTJ</button>
-      <SearchFilters />
-      <JournalTimeline entries={placeholderEntries} />
-    </div>
+    </>
   )
 }
 
