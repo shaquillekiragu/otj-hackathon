@@ -13,10 +13,16 @@ export type JournalEntry = {
   userId: ObjectId;
   title: string;
   category: string;
-  description: string;
-  timeSheets: Timesheet[];
+  description: Description;
+  timeSheets?: Timesheet[];
   createdAt: Date;
   lastUpdatedAt: Date;
+}
+
+export type Description = {
+    intend: string;
+    implementation: string;
+    impact: string;
 }
 
 export type User = {
