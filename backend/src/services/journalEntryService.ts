@@ -97,24 +97,23 @@ export const getJournalEntryByIdService = async (
 };
 
 export const updateJournalEntryService = async (updateInput: JournalInput) => {
-  const { id, userId, tagIds, ...rest } = updateInput;
-  const updatedAt = new Date();
-
-  const updateData: Partial<JournalEntryDocument> = {
-    ...rest,
-    userId: new ObjectId(userId),
-    tagIds,
-    updatedAt,
-  };
-
   const updatedJournalEntry = await journalEntriesCollection().findOneAndUpdate(
-    { _id: new ObjectId(id) },
-    { $set: updateData },
+    { _id: new ObjectId(updateInput.id) },
+    {
+      $set: {
+        ...updateInput,
+        userId: new ObjectId(updateInput.userId),
+        updateInput: new Date(),
+      },
+    },
     { returnDocument: 'after' },
   );
 
   if (!updatedJournalEntry) {
-    throw new ApiError(`Journal entry not found for journal: ${id}`, 404);
+    throw new ApiError(
+      `Journal entry not found for journal: ${updateInput.id}`,
+      404,
+    );
   }
 
   return updatedJournalEntry;
@@ -124,5 +123,6 @@ export const deleteJournalEntryService = async (id: string) => {
   const result = await journalEntriesCollection().deleteOne({
     _id: new ObjectId(id),
   });
+
   return result.deletedCount === 1;
 };

@@ -4,8 +4,9 @@ import {
   listJournalEntriesByUserIdService,
   getJournalEntryByIdService,
   updateJournalEntryService,
+  deleteJournalEntryService,
 } from '../services/journalEntryService';
-import { GetJournalEntryByIdInput } from '../types/payload';
+import { JournalIdInput } from '../types/payload';
 import { ApiError } from '../utils/apiError';
 
 export const createJournalEntry = async (req: Request, res: Response) => {
@@ -60,7 +61,7 @@ export const listJournalEntriesByUser = async (req: Request, res: Response) => {
 };
 
 export const getJournalEntry = async (
-  req: Request<GetJournalEntryByIdInput>,
+  req: Request<JournalIdInput>,
   res: Response,
 ) => {
   try {
@@ -108,6 +109,31 @@ export const updateJournalEntry = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: `Failed to update journal entry ${req.body.id} for user: ${req.body.userId}`,
+    });
+  }
+};
+export const deleteJournalEntry = async (req: Request, res: Response) => {
+  try {
+    const deletedCount = await deleteJournalEntryService(req.body.id);
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully deleted journal entry: ${req.body.id}`,
+      deletedCount,
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    console.error('Unexpected error deleting journal entry:', error);
+
+    res.status(500).json({
+      success: false,
+      message: `Failed to delete journal entry ${req.body.id} for user: ${req.body.userId}`,
     });
   }
 };

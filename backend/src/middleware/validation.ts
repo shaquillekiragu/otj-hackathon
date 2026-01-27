@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/apiError';
 import { validateRequiredFields } from './utils/validateRequiredFields';
 
-export const validateJournalEntry = (
+export const validateJournalEntryRequest = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -24,7 +24,7 @@ export const validateJournalEntry = (
   }
 };
 
-export const validateListJournalEntriesByUser = (
+export const validateUserIdInBody = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -38,7 +38,7 @@ export const validateListJournalEntriesByUser = (
   next();
 };
 
-export const validateGetJournalEntry = (
+export const validateJournalIdInParams = (
   req: Request,
   res: Response,
   next: NextFunction,

@@ -4,37 +4,40 @@ import {
   listJournalEntriesByUser,
   getJournalEntry,
   updateJournalEntry,
+  deleteJournalEntry,
 } from '../controllers/journalController';
 import {
-  validateJournalEntry,
-  validateListJournalEntriesByUser,
-  validateGetJournalEntry,
+  validateJournalEntryRequest,
+  validateUserIdInBody,
+  validateJournalIdInParams,
   validatePaginationParams,
 } from '../middleware/validation';
 
 const router = express.Router();
 
-router.post('/', validateJournalEntry, createJournalEntry);
+router.post('/', validateJournalEntryRequest, createJournalEntry);
 
 router.get(
   '/',
-  validateListJournalEntriesByUser,
+  validateUserIdInBody,
   validatePaginationParams,
   listJournalEntriesByUser,
 );
 
 router.get(
   '/:id',
-  validateGetJournalEntry,
+  validateJournalIdInParams,
   validatePaginationParams,
   getJournalEntry,
 );
 
 router.put(
   '/:id',
-  validateJournalEntry,
-  validateGetJournalEntry,
+  validateJournalEntryRequest,
+  validateJournalIdInParams,
   updateJournalEntry,
 );
+
+router.delete('/:id', validateJournalIdInParams, deleteJournalEntry);
 
 export default router;
