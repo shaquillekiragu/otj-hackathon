@@ -1,9 +1,11 @@
-import { Collection, Document } from "mongodb";
-import { getDb } from "./mongoClient";
-import { User, JournalEntry, Tag } from "../types/types";
+import { Collection, Document } from 'mongodb';
+import { getDb } from './mongoClient';
+import { UserDocument, JournalEntryDocument, TagDocument } from '../types/db';
 
-const getCollection = <T extends Document>(name: string): Collection<T> => getDb().collection<T>(name);
+const getCollection = <T extends Document>(name: string): Collection<T> =>
+  getDb().collection<T>(name);
 
-export const usersCollection = () => getCollection<User>("users");
-export const journalEntriesCollection = () => getCollection<JournalEntry>("journalEntries");
-export const tagsCollection = () => getCollection<Tag>("tags");
+export const usersCollection = () => getCollection<UserDocument>('users');
+export const journalEntriesCollection = () =>
+  getCollection<JournalEntryDocument>('journalEntries');
+export const tagsCollection = () => getCollection<TagDocument>('tags');
