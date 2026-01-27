@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '../utils/apiError';
-import { validateRequiredFields } from './utils/validateRequiredFields';
+import { ApiError } from '../../utils/apiError';
+import { validateRequiredFields } from '../utils/validateRequiredFields';
 
 export const validateJournalEntryRequest = (
   req: Request,

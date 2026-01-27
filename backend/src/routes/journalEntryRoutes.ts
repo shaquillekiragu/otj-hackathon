@@ -11,7 +11,7 @@ import {
   validateUserIdInBody,
   validatePaginationParams,
   validateJournalIdInBody,
-} from '../middleware/validation';
+} from '../middleware/journalEntry/validation';
 
 const router = express.Router();
 
