@@ -20,6 +20,7 @@ function TagSection({
 }: TagSectionProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedColor, setSelectedColor] = useState('#3B82F6')
 
   const availableTags = PLACEHOLDER_TAGS.filter(
     (tag) => !selectedTags.find((t) => t.id === tag.id)
@@ -38,7 +39,25 @@ function TagSection({
   const handleCloseDropdown = () => {
     setIsDropdownOpen(false)
     setSearchQuery('')
+    setSelectedColor('#3B82F6')
   }
+
+  const handleCreateTag = () => {
+    if (!searchQuery.trim()) return
+
+    const newTag: Tag = {
+      id: `temp-${Date.now()}`,
+      name: searchQuery.trim(),
+      hexColor: selectedColor
+    }
+
+    onAddTag?.(newTag)
+    setSearchQuery('')
+    setSelectedColor('#3B82F6')
+    setIsDropdownOpen(false)
+  }
+
+  const showCreateOption = searchQuery.trim() && filteredTags.length === 0
 
   return (
     <div className="mt-6">
@@ -111,6 +130,26 @@ function TagSection({
                           </div>
                         </div>
                       ))
+                    ) : showCreateOption ? (
+                      <div className="!w-full !px-4 !py-3 !flex !items-center !gap-3 !bg-white !border-b !border-gray-100">
+                        <button
+                          type="button"
+                          onClick={handleCreateTag}
+                          className="!flex-1 hover:!bg-blue-50 !flex !items-center !gap-2 !bg-transparent !border-none !text-left !rounded !px-2 !py-1 cursor-pointer"
+                        >
+                          <span className="text-blue-600 font-semibold">+</span>
+                          <span className="text-gray-700">
+                            Create tag "{searchQuery.trim()}"
+                          </span>
+                        </button>
+                        <input
+                          type="color"
+                          value={selectedColor}
+                          onChange={(e) => setSelectedColor(e.target.value)}
+                          className="w-16 h-8 rounded cursor-pointer border border-gray-300"
+                          title="Choose tag color"
+                        />
+                      </div>
                     ) : (
                       <div className="px-4 py-3 text-gray-500 text-sm">
                         No tags found
