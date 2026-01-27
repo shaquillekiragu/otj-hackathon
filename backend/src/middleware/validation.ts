@@ -71,3 +71,17 @@ export const validatePaginationParams = (
 
   next();
 };
+
+export const validateUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.params.id) {
+    return res.status(400).json({
+      message: `Failed to fetch user - missing userId: ${req.params.id}`,
+    });
+  }
+
+  next();
+};

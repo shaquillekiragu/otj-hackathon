@@ -18,3 +18,7 @@ export type ListJournalEntriesByUserInput = {
 export type GetJournalEntryByIdInput = {
   id: string;
 };
+
+export type GetUserByIdInput = {
+  id: string;
+}
