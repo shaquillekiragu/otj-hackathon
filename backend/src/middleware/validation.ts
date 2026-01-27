@@ -31,21 +31,21 @@ export const validateUserIdInBody = (
 ) => {
   if (!req.body.userId) {
     return res.status(400).json({
-      message: `Failed to fetch all journal entries - missing userId: ${req.body.userId}`,
+      message: `Failed to fetch all journal entries - missing userId in request body: ${req.body.userId}`,
     });
   }
 
   next();
 };
 
-export const validateJournalIdInParams = (
+export const validateJournalIdInBody = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.params.id) {
+  if (!req.body.id) {
     return res.status(400).json({
-      message: `Failed to fetch journal entry - missing journalId: ${req.params.id}`,
+      message: `Failed to fetch journal entry - missing journalId in request body: ${req.body.id}`,
     });
   }
 

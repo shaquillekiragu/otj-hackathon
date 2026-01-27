@@ -68,7 +68,7 @@ export const getJournalEntry = async (
     const { page, limit } = req.query;
 
     const journalEntry = await getJournalEntryByIdService(
-      req.params.id,
+      req.body.id,
       page as string,
       limit as string,
     );

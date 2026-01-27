@@ -9,8 +9,8 @@ import {
 import {
   validateJournalEntryRequest,
   validateUserIdInBody,
-  validateJournalIdInParams,
   validatePaginationParams,
+  validateJournalIdInBody,
 } from '../middleware/validation';
 
 const router = express.Router();
@@ -26,18 +26,18 @@ router.get(
 
 router.get(
   '/:id',
-  validateJournalIdInParams,
+  validateJournalIdInBody,
   validatePaginationParams,
   getJournalEntry,
 );
 
 router.put(
   '/:id',
+  validateJournalIdInBody,
   validateJournalEntryRequest,
-  validateJournalIdInParams,
   updateJournalEntry,
 );
 
-router.delete('/:id', validateJournalIdInParams, deleteJournalEntry);
+router.delete('/:id', validateJournalIdInBody, deleteJournalEntry);
 
 export default router;
