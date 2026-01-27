@@ -1,9 +1,9 @@
 import express from 'express';
 import { getUser } from '../controllers/userController';
-import { validateUser } from '../middleware/validation';
+import { validateUserRequest, validateNameInBody, validateExpectedOTJHoursInBody, validateActualOTJHoursInBody, validateTotalOTJHoursInBody, validateLastOTJActivityInBody, validateCreatedAtInBody } from '../middleware/user/validation';
 
 const router = express.Router();
 
-router.get('/:id', validateUser, getUser)
+router.get('/:id', validateUserRequest, getUser)
 
 export default router;

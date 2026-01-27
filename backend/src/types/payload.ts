@@ -11,13 +11,9 @@ export type JournalInput = {
 };
 
 export type UserIdInput = {
-  userId: string;
+  id: string;
 };
 
 export type JournalIdInput = {
   id: string;
 };
-
-export type GetUserByIdInput = {
-  id: string;
-}

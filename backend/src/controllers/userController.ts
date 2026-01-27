@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { getUserByIdService } from '../services/userService';
-import { GetUserByIdInput } from '../types/payload';
+import { UserIdInput } from '../types/payload';
 import { ApiError } from '../utils/apiError';
 
-export const getUser = async (req: Request<GetUserByIdInput>, res: Response) => {
+export const getUser = async (req: Request<UserIdInput>, res: Response) => {
 	try {
-		const user = await getUserByIdService(req.body);
+		const user = await getUserByIdService(req.params.id);
 		res.status(200).json({ success: true, user })
 	} catch (error) {
 		if (error instanceof ApiError) {
