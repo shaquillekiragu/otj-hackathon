@@ -43,9 +43,22 @@ export const validateJournalIdInBody = (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.id) {
+  if (!req.body.journalId) {
     return res.status(400).json({
-      message: `Failed to fetch journal entry - missing journalId in request body: ${req.body.id}`,
+      message: `Failed to fetch journal entry - missing journalId in request body: ${req.body.journalId}`,
+    });
+  }
+
+  next();
+};
+export const validateJournalIdInParams = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.params.journalId) {
+    return res.status(400).json({
+      message: `Failed to fetch journal entry - missing journalId in request params: ${req.params.journalId}`,
     });
   }
 

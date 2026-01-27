@@ -1,9 +1,16 @@
 import { ObjectId } from 'mongodb';
 import { journalEntriesCollection } from '../db/collections';
-import { Description, JournalEntryDocument, TimeSheet } from '../types/db';
+import {
+  Description,
+  JournalEntryDocument,
+  TagDocument,
+  TimeSheet,
+} from '../types/db';
 import { getPagination } from '../utils/pagination';
 import { ApiError } from '../utils/apiError';
 import { JournalInput } from '../types/payload';
+import { normaliseTagsForUser } from './utils/normaliseTagsForUsers';
+import { syncUserTags } from './tagService';
 
 export const createJournalEntryService = async (createInput: JournalInput) => {
   const {
@@ -12,8 +19,16 @@ export const createJournalEntryService = async (createInput: JournalInput) => {
     description,
     category,
     timeSheets = [],
-    tagIds = [],
+    tags = [],
   } = createInput;
+
+  const userObjectId = new ObjectId(userId);
+
+  const normalisedTags = normaliseTagsForUser(userObjectId, tags);
+
+  if (normalisedTags.length > 0) {
+    await syncUserTags(userObjectId, normalisedTags);
+  }
 
   const newJournalEntry: JournalEntryDocument = {
     userId: new ObjectId(userId),
@@ -21,7 +36,7 @@ export const createJournalEntryService = async (createInput: JournalInput) => {
     category,
     description,
     timeSheets,
-    tagIds,
+    tags: normalisedTags,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -66,18 +81,21 @@ export const listJournalEntriesByUserIdService = async (
 };
 
 export const getJournalEntryByIdService = async (
-  id: string,
+  journalId: string,
   page?: string,
   limit?: string,
 ) => {
   const { page: pageNum, limit: limitNum, skip } = getPagination(page, limit);
 
   const journalEntry = await journalEntriesCollection().findOne({
-    _id: new ObjectId(id),
+    _id: new ObjectId(journalId),
   });
 
   if (!journalEntry) {
-    throw new ApiError(`Journal entry not found for journal: ${id}`, 404);
+    throw new ApiError(
+      `Journal entry not found for journal: ${journalId}`,
+      404,
+    );
   }
 
   const timesheets: TimeSheet[] = journalEntry.timeSheets || [];
@@ -96,22 +114,53 @@ export const getJournalEntryByIdService = async (
   };
 };
 
-export const updateJournalEntryService = async (updateInput: JournalInput) => {
+export const updateJournalEntryService = async (
+  journalId: string,
+  updateInput: JournalInput,
+) => {
+  const { title, category, description, tags, timeSheets } = updateInput;
+
+  const journalObjectId = new ObjectId(journalId);
+
+  const journalEntry = await journalEntriesCollection().findOne({
+    _id: journalObjectId,
+  });
+
+  if (!journalEntry) {
+    throw new ApiError(
+      `Journal entry not found for journal: ${journalId}`,
+      404,
+    );
+  }
+
+  const updatedFields: Partial<JournalEntryDocument> = {
+    title,
+    category,
+    description,
+    updatedAt: new Date(),
+  };
+
+  if (typeof timeSheets !== 'undefined') {
+    updatedFields.timeSheets = timeSheets;
+  }
+
+  if (typeof tags !== 'undefined') {
+    const normalisedTags = normaliseTagsForUser(journalEntry.userId, tags);
+
+    await syncUserTags(journalEntry.userId, normalisedTags);
+
+    updatedFields.tags = normalisedTags;
+  }
+
   const updatedJournalEntry = await journalEntriesCollection().findOneAndUpdate(
-    { _id: new ObjectId(updateInput.id) },
-    {
-      $set: {
-        ...updateInput,
-        userId: new ObjectId(updateInput.userId),
-        updateInput: new Date(),
-      },
-    },
+    { _id: journalObjectId },
+    { $set: updatedFields },
     { returnDocument: 'after' },
   );
 
   if (!updatedJournalEntry) {
     throw new ApiError(
-      `Journal entry not found for journal: ${updateInput.id}`,
+      `Journal entry not found for journal: ${journalId}`,
       404,
     );
   }
@@ -119,10 +168,10 @@ export const updateJournalEntryService = async (updateInput: JournalInput) => {
   return updatedJournalEntry;
 };
 
-export const deleteJournalEntryService = async (id: string) => {
+export const deleteJournalEntryService = async (journalId: string) => {
   const result = await journalEntriesCollection().deleteOne({
-    _id: new ObjectId(id),
+    _id: new ObjectId(journalId),
   });
 
-  return result.deletedCount === 1;
+  return result.deletedCount;
 };

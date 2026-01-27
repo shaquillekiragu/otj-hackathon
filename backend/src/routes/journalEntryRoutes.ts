@@ -5,12 +5,13 @@ import {
   getJournalEntry,
   updateJournalEntry,
   deleteJournalEntry,
-} from '../controllers/journalController';
+} from '../controllers/journalEntryController';
 import {
   validateJournalEntryRequest,
   validateUserIdInBody,
-  validatePaginationParams,
   validateJournalIdInBody,
+  validateJournalIdInParams,
+  validatePaginationParams,
 } from '../middleware/journalEntry/validation';
 
 const router = express.Router();
@@ -25,19 +26,19 @@ router.get(
 );
 
 router.get(
-  '/:id',
-  validateJournalIdInBody,
+  '/:journalId',
+  validateJournalIdInParams,
   validatePaginationParams,
   getJournalEntry,
 );
 
 router.put(
-  '/:id',
-  validateJournalIdInBody,
+  '/:journalId',
+  validateJournalIdInParams,
   validateJournalEntryRequest,
   updateJournalEntry,
 );
 
-router.delete('/:id', validateJournalIdInBody, deleteJournalEntry);
+router.delete('/:journalId', validateJournalIdInParams, deleteJournalEntry);
 
 export default router;

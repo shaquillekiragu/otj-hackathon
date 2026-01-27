@@ -1,13 +1,18 @@
 import { Description, TimeSheet } from './db';
 
 export type JournalInput = {
-  id?: string;
+  journalId?: string;
   userId: string;
   title: string;
   description: Description;
   category: string;
   timeSheets?: TimeSheet[];
-  tagIds?: string[];
+  tags?: TagInput[];
+};
+
+export type TagInput = {
+  tagDescription: string;
+  tagColour: string;
 };
 
 export type UserIdInput = {
@@ -15,5 +20,5 @@ export type UserIdInput = {
 };
 
 export type JournalIdInput = {
-  id: string;
+  journalId: string;
 };
