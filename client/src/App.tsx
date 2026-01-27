@@ -1,4 +1,5 @@
 import JournalTimeline from './components/JournalTimeline'
+import SearchFilters from './components/SearchFilters'
 
 function App() {
   const placeholderEntries = [
@@ -32,7 +33,7 @@ function App() {
         <h2>You are currently 3 hours ahead of expectations.</h2>
       </div>
       <button className="px-12!">Log OTJ</button>
-      <div>{/* search + filters here */}</div>
+      <SearchFilters />
       <JournalTimeline entries={placeholderEntries} />
     </div>
   )
