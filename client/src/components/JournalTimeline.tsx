@@ -11,7 +11,7 @@ interface JournalTimelineProps {
   entries: JournalEntry[]
 }
 
-function JournalTimeline({ entries }: JournalTimelineProps) {
+const JournalTimeline = ({ entries }: JournalTimelineProps) => {
   return (
     <div className="flex flex-col w-full px-8">
       {entries.map((entry, index) => (
