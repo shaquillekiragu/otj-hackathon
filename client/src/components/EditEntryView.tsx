@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import TimesheetSection from './TimesheetSection'
+import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
+import { PLACEHOLDER_TAGS, type Tag } from '../types/journal'
 
 function EditEntryView() {
   const timesheetProps = useTimesheetManagement()
@@ -12,6 +14,23 @@ function EditEntryView() {
     learningMethod: 'Placeholder text for learning method',
     impact: 'Placeholder text for impact'
   })
+
+  // Placeholder: selected tags for this entry (will come from API)
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([
+    PLACEHOLDER_TAGS[0],
+    PLACEHOLDER_TAGS[2],
+    PLACEHOLDER_TAGS[4]
+  ])
+
+  const addTag = (tag: Tag) => {
+    if (!selectedTags.find((t) => t.id === tag.id)) {
+      setSelectedTags([...selectedTags, tag])
+    }
+  }
+
+  const removeTag = (tagId: string) => {
+    setSelectedTags(selectedTags.filter((t) => t.id !== tagId))
+  }
 
   const sections = [
     {
@@ -69,6 +88,13 @@ function EditEntryView() {
       ))}
 
       <TimesheetSection {...timesheetProps} />
+
+      <TagSection
+        selectedTags={selectedTags}
+        mode="edit"
+        onAddTag={addTag}
+        onRemoveTag={removeTag}
+      />
     </>
   )
 }
