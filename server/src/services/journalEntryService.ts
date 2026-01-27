@@ -7,7 +7,7 @@ import {
   TimeSheet,
 } from '../types/db';
 import { syncUserTags } from './tagService';
-import { getPagination } from '../utils/pagination';
+import { getPagination } from './utils/pagination';
 import { ApiError } from '../utils/apiError';
 import { normaliseTagsForUser } from './utils/normaliseTagsForUsers';
 import { JournalInput } from '../types/payload';
