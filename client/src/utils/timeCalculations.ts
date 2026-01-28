@@ -27,3 +27,16 @@ export const formatDateForDisplay = (isoDate: string): string => {
     year: 'numeric'
   })
 }
+
+export const parseDateForInput = (displayDate: string): string => {
+  if (!displayDate) return ''
+  // Convert "21 Jan 2026" to "2026-01-21"
+  const date = new Date(displayDate)
+  if (isNaN(date.getTime())) return ''
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
