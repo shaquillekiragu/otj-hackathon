@@ -1,4 +1,25 @@
+import { useState, useEffect } from 'react'
+
 const SearchFilters = () => {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Placeholder function for API call
+  const fetchSearchResults = (query: string) => {
+    console.log('Fetching search results for:', query)
+    // TODO: Replace with actual API call
+  }
+
+  // Debounce logic
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchTerm) {
+        fetchSearchResults(searchTerm)
+      }
+    }, 500) // 500ms delay
+
+    return () => clearTimeout(debounceTimer)
+  }, [searchTerm])
+
   const filterOptions = [
     {
       label: 'Category',
@@ -39,7 +60,13 @@ const SearchFilters = () => {
     <div className="flex flex-col items-start justify-start gap-1 lg:flex-row lg:items-end lg:justify-between w-full lg:pr-8">
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium">Search</label>
-        <input type="text" className="border rounded-lg p-2 min-w-md" />
+        <input
+          type="text"
+          className="border rounded-lg p-2 min-w-md"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search..."
+        />
       </div>
       <div className="flex gap-4">
         {filterOptions.map((filter) => (
