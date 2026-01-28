@@ -24,14 +24,14 @@ export const validateJournalEntryRequest = (
   }
 };
 
-export const validateUserIdInBody = (
+export const validateUserIdInParams = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.body.userId) {
+  if (!req.query.userId) {
     return res.status(400).json({
-      message: `Failed to fetch all journal entries - missing userId in request body: ${req.body.userId}`,
+      message: `Failed to fetch all journal entries - missing userId in query params: ${req.query.userId}`,
     });
   }
 

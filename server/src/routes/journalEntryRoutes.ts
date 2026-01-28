@@ -8,7 +8,7 @@ import {
 } from '../controllers/journalEntryController';
 import {
   validateJournalEntryRequest,
-  validateUserIdInBody,
+  validateUserIdInParams,
   validateJournalIdInParams,
   validatePaginationParams,
 } from '../middleware/journalEntry/validation';
@@ -19,7 +19,7 @@ router.post('/', validateJournalEntryRequest, createJournalEntry);
 
 router.get(
   '/',
-  validateUserIdInBody,
+  validateUserIdInParams,
   validatePaginationParams,
   listJournalEntriesByUser,
 );
