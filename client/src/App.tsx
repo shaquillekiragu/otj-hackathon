@@ -16,19 +16,13 @@ const App = () => {
   return (
     <>
       {showModal && (
-        <div
-          className="w-screen h-screen z-10 bg-transparent" onClick={() => {
+        <Modal
+          onClose={() => {
             setShowModal(false)
             setEntryToView('')
-          }}>
-          <Modal
-            onClose={() => {
-              setShowModal(false)
-              setEntryToView('')
-            }}
-            entryId={entryToView}
-          />
-        </div>
+          }}
+          entryId={entryToView}
+        />
       )}
       <div className="flex flex-col items-center justify-start p-4 gap-4">
         <div className="w-full">
