@@ -24,8 +24,8 @@ export default function ProgressTracker(){
 							style={{ background: percentageOfExpectedGradient }}
 						>
 							<div className="w-45 h-45 rounded-full flex flex-col justify-center items-center gap-3 bg-white border border-gray-500">
-								<p className="text-4xl font-bold">{percentageOfTotal}%</p>
-								<p className="text-4xl font-bold">{percentageOfExpected}%</p>
+								<p className="text-4xl font-bold text-blue-700">{percentageOfTotal}%</p>
+								<p className="text-4xl font-bold text-green-700">{percentageOfExpected}%</p>
 							</div>
 						</div>
 					</div>
