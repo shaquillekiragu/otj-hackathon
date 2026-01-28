@@ -3,9 +3,13 @@ const SearchFilters = () => {
     {
       label: 'Category',
       options: [
-        { value: 'learning', label: 'Learning' },
-        { value: 'project', label: 'Project' },
-        { value: 'meeting', label: 'Meeting' }
+        { value: 'Technical Skills', label: 'Technical Skills' },
+        {
+          value: 'Professional Development',
+          label: 'Professional Development'
+        },
+        { value: 'Project Work', label: 'Project Work' },
+        { value: 'Team Collaboration', label: 'Team Collaboration' }
       ]
     },
     {
