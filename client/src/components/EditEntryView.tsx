@@ -10,6 +10,7 @@ interface EditEntryViewProps {
   entryData: JournalEntry | null
   onUpdate: (updates: Partial<JournalEntry>) => void
   onTagsUpdate: (tags: Tag[]) => void
+  onTimesheetsUpdate: (timesheets: TimesheetEntry[]) => void
   timesheetEntries: TimesheetEntry[]
   fetchTimesheets: (page: number) => Promise<void>
   totalPages: number
@@ -20,6 +21,7 @@ const EditEntryView = ({
   entryData,
   onUpdate,
   onTagsUpdate,
+  onTimesheetsUpdate,
   timesheetEntries,
   fetchTimesheets,
   totalPages,
@@ -29,7 +31,8 @@ const EditEntryView = ({
     initialEntries: timesheetEntries,
     fetchTimesheets,
     totalPages,
-    currentPage
+    currentPage,
+    onTimesheetsUpdate
   })
 
   // Local state for form fields

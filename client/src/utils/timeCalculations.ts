@@ -26,7 +26,11 @@ export const formatDuration = (minutes: number): string => {
 
 export const formatDate = (isoDate: string): string => {
   if (!isoDate) return ''
-  const date = new Date(isoDate)
+
+  // If it's already in YYYY-MM-DD format (from input type="date"), parse it correctly
+  const date = isoDate.includes('T')
+    ? new Date(isoDate)
+    : new Date(isoDate + 'T00:00:00')
   if (isNaN(date.getTime())) return ''
 
   const day = date.getDate()
@@ -45,6 +49,13 @@ export const formatDate = (isoDate: string): string => {
 
 export const formatTime = (isoTime: string): string => {
   if (!isoTime) return ''
+
+  // If it's already in HH:MM format (from input type="time"), return it as is
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(isoTime)) {
+    return isoTime.substring(0, 5) // Return HH:MM part only
+  }
+
+  // Otherwise, treat it as an ISO date string
   const date = new Date(isoTime)
   if (isNaN(date.getTime())) return ''
 
