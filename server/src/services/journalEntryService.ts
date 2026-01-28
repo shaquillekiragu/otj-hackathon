@@ -22,6 +22,10 @@ export const createJournalEntryService = async (createInput: JournalInput) => {
     tags = [],
   } = createInput;
 
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(`Invalid userId format: ${userId}`, 400);
+  }
+
   const userObjectId = new ObjectId(userId);
 
   const normalisedTags = normaliseTagsForUser(userObjectId, tags);
@@ -55,6 +59,10 @@ export const getJournalEntryByIdService = async (
   page?: string,
   limit?: string,
 ) => {
+  if (!ObjectId.isValid(journalId)) {
+    throw new ApiError(`Invalid journalId format: ${journalId}`, 400);
+  }
+
   const { page: pageNum, limit: limitNum, skip } = getPagination(page, limit);
 
   const journalEntry = await journalEntriesCollection().findOne({
@@ -91,6 +99,10 @@ export const listJournalEntriesByUserIdService = async (
 ) => {
   if (!userId) throw new ApiError('Missing userId', 400);
 
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(`Invalid userId format: ${userId}`, 400);
+  }
+
   const { page: pageNum, limit: limitNum, skip } = getPagination(page, limit);
 
   const query = { userId: new ObjectId(userId) };
@@ -119,6 +131,10 @@ export const updateJournalEntryService = async (
   updateInput: JournalInput,
 ) => {
   const { title, category, description, tags, timeSheets } = updateInput;
+
+  if (!ObjectId.isValid(journalId)) {
+    throw new ApiError(`Invalid journalId format: ${journalId}`, 400);
+  }
 
   const journalObjectId = new ObjectId(journalId);
 
@@ -169,6 +185,10 @@ export const updateJournalEntryService = async (
 };
 
 export const deleteJournalEntryService = async (journalId: string) => {
+  if (!ObjectId.isValid(journalId)) {
+    throw new ApiError(`Invalid journalId format: ${journalId}`, 400);
+  }
+
   const result = await journalEntriesCollection().deleteOne({
     _id: new ObjectId(journalId),
   });
