@@ -2,15 +2,13 @@ import { ObjectId } from 'mongodb';
 import { usersCollection } from '../db/collections';
 import { ApiError } from '../utils/apiError';
 
-export const getUserByIdService = async (
-	id: string,
-) => {
+export const getUserByIdService = async (userId: string) => {
 	const user = await usersCollection().findOne({
-		_id: new ObjectId(id),
+		_id: new ObjectId(userId),
 	});
 
 	if (!user) {
-		throw new ApiError(`User${id} not found`, 404);
+		throw new ApiError(`User not found for id: ${userId}`, 404);
 	}
 
 	return user;

@@ -1,8 +1,9 @@
 import { ObjectId } from 'mongodb';
 
 export type UserDocument = {
-  _id: ObjectId;
-  name: string;
+  _id?: ObjectId;
+  firstName: string;
+  lastName: string;
   expectedOTJHours: number;
   actualOTJHours: number;
   totalOTJHours: number;
@@ -17,7 +18,7 @@ export type JournalEntryDocument = {
   category: string;
   description: Description;
   timeSheets?: TimeSheet[];
-  tagIds?: TagId[];
+  tags?: TagDocument[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -35,10 +36,8 @@ export type TimeSheet = {
   duration: number;
 };
 
-export type TagId = string;
-
 export type TagDocument = {
-  _id: ObjectId;
+  _id?: ObjectId;
   userId: ObjectId;
   tagDescription: string;
   tagColour: string;
