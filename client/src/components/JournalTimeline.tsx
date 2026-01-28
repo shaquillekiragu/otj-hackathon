@@ -1,23 +1,18 @@
-import { useEffect, useState } from 'react'
 import JournalListCard from './JournalListCard'
-import { getAllJournalEntries, type JournalEntry } from '../utils/journalData'
+import { useJournalEntries } from '../hooks/useJournalEntries'
 
 interface JournalTimelineProps {
   handleClick: (id: string) => void
 }
 
 const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
-  const [entries, setEntries] = useState<JournalEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const { entries, loading, error } = useJournalEntries()
 
-  useEffect(() => {
-    const loadEntries = async () => {
-      const data = await getAllJournalEntries()
-      setEntries(data)
-      setLoading(false)
-    }
-    loadEntries()
-  }, [])
+  if (error) {
+    return (
+      <div className="flex justify-center p-8 text-red-500">Error: {error}</div>
+    )
+  }
 
   if (loading) {
     return <div className="flex justify-center p-8">Loading entries...</div>
