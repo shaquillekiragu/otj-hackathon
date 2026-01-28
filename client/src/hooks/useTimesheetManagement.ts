@@ -5,7 +5,7 @@ import {
   formatDateForDisplay
 } from '../utils/timeCalculations'
 
-export function useTimesheetManagement() {
+export const useTimesheetManagement = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [isAddingTimesheet, setIsAddingTimesheet] = useState(false)
   const [newEntry, setNewEntry] = useState<NewTimesheetEntry>({

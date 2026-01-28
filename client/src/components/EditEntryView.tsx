@@ -2,46 +2,65 @@ import { useState } from 'react'
 import TimesheetSection from './TimesheetSection'
 import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
-import { PLACEHOLDER_TAGS, type Tag } from '../types/journal'
+import { type Tag } from '../types/journal'
+import { type JournalEntry } from '../utils/journalData'
 
-function EditEntryView() {
+interface EditEntryViewProps {
+  entryData: JournalEntry | null
+  onUpdate: (updates: Partial<JournalEntry>) => void
+  onTagsUpdate: (tags: Tag[]) => void
+}
+
+const EditEntryView = ({
+  entryData,
+  onUpdate,
+  onTagsUpdate
+}: EditEntryViewProps) => {
   const timesheetProps = useTimesheetManagement()
 
-  const [entryData, setEntryData] = useState({
-    title: 'Entry Title',
-    category: 'Category Name',
-    learningAims: 'Placeholder text for learning aims',
-    learningMethod: 'Placeholder text for learning method',
-    impact: 'Placeholder text for impact'
+  // Local state for form fields
+  const [localData, setLocalData] = useState({
+    title: entryData?.title || '',
+    category: entryData?.category || '',
+    learningAims: entryData?.learningAims || '',
+    learningMethod: entryData?.learningMethod || '',
+    impact: entryData?.impact || ''
   })
 
-  // Placeholder: selected tags for this entry (will come from API)
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([
-    PLACEHOLDER_TAGS[0],
-    PLACEHOLDER_TAGS[2],
-    PLACEHOLDER_TAGS[4]
-  ])
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(
+    entryData?.selectedTags || []
+  )
+
+  const handleFieldChange = (field: keyof typeof localData, value: string) => {
+    const updated = { ...localData, [field]: value }
+    setLocalData(updated)
+    onUpdate(updated)
+  }
 
   const addTag = (tag: Tag) => {
     if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag])
+      const updatedTags = [...selectedTags, tag]
+      setSelectedTags(updatedTags)
+      onTagsUpdate(updatedTags)
     }
   }
 
   const removeTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((t) => t.id !== tagId))
+    const updatedTags = selectedTags.filter((t) => t.id !== tagId)
+    setSelectedTags(updatedTags)
+    onTagsUpdate(updatedTags)
   }
 
   const sections = [
     {
       title: 'What you were aiming to learn',
-      field: 'learningAims' as keyof typeof entryData
+      field: 'learningAims' as keyof typeof localData
     },
     {
       title: 'How you learnt it',
-      field: 'learningMethod' as keyof typeof entryData
+      field: 'learningMethod' as keyof typeof localData
     },
-    { title: 'What was the impact', field: 'impact' as keyof typeof entryData }
+    { title: 'What was the impact', field: 'impact' as keyof typeof localData }
   ]
 
   return (
@@ -49,25 +68,29 @@ function EditEntryView() {
       <div className="flex justify-between items-start mb-2">
         <input
           type="text"
-          value={entryData.title}
-          onChange={(e) =>
-            setEntryData({ ...entryData, title: e.target.value })
-          }
+          value={localData.title}
+          onChange={(e) => handleFieldChange('title', e.target.value)}
+          placeholder="Title..."
           className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 w-2/3"
         />
         <p className="text-sm text-gray-600">
-          Latest time sheet update: 17/01/26
+          Latest time sheet update: {entryData?.lastTimesheetUpdate || 'N/A'}
         </p>
       </div>
 
-      <input
-        type="text"
-        value={entryData.category}
-        onChange={(e) =>
-          setEntryData({ ...entryData, category: e.target.value })
-        }
+      <select
+        value={localData.category}
+        onChange={(e) => handleFieldChange('category', e.target.value)}
         className="mb-4 border border-gray-300 rounded px-2 py-1 w-full"
-      />
+      >
+        <option value="">Select a category...</option>
+        <option value="Technical Skills">Technical Skills</option>
+        <option value="Professional Development">
+          Professional Development
+        </option>
+        <option value="Project Work">Project Work</option>
+        <option value="Team Collaboration">Team Collaboration</option>
+      </select>
 
       {sections.map((section, index) => (
         <div
@@ -78,10 +101,8 @@ function EditEntryView() {
             {section.title}
           </h3>
           <textarea
-            value={entryData[section.field]}
-            onChange={(e) =>
-              setEntryData({ ...entryData, [section.field]: e.target.value })
-            }
+            value={localData[section.field]}
+            onChange={(e) => handleFieldChange(section.field, e.target.value)}
             className="w-full border border-gray-300 rounded px-2 py-1 min-h-20"
           />
         </div>
