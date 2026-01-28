@@ -32,7 +32,7 @@ export const getJournalEntry = async (req: Request, res: Response) => {
     handleError(
       res,
       error,
-      `Failed to get journal entry for id: ${req.params.id}`,
+      `Failed to get journal entry for id: ${req.params.journalId}`,
     );
   }
 };

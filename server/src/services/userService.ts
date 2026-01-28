@@ -3,6 +3,10 @@ import { usersCollection } from '../db/collections';
 import { ApiError } from '../utils/apiError';
 
 export const getUserByIdService = async (userId: string) => {
+	if (!ObjectId.isValid(userId)) {
+		throw new ApiError(`Invalid userId format: ${userId}`, 400);
+	}
+
 	const user = await usersCollection().findOne({
 		_id: new ObjectId(userId),
 	});
