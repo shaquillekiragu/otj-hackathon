@@ -2,6 +2,7 @@ import { useState } from 'react'
 import JournalTimeline from './components/JournalTimeline'
 import SearchFilters from './components/SearchFilters'
 import Modal from './components/Modal'
+import ProgressTracker from './components/ProgressTracker'
 
 function App() {
   const [showModal, setShowModal] = useState(true)
@@ -43,6 +44,7 @@ function App() {
         </button>
         <SearchFilters />
         <JournalTimeline entries={placeholderEntries} />
+        <ProgressTracker />
       </div>
     </>
   )
