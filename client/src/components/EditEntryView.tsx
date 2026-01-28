@@ -31,6 +31,8 @@ const EditEntryView = ({
     entryData?.selectedTags || []
   )
 
+  const [showCategoryTooltip, setShowCategoryTooltip] = useState(false)
+
   const handleFieldChange = (field: keyof typeof localData, value: string) => {
     const updated = { ...localData, [field]: value }
     setLocalData(updated)
@@ -78,19 +80,45 @@ const EditEntryView = ({
         </p>
       </div>
 
-      <select
-        value={localData.category}
-        onChange={(e) => handleFieldChange('category', e.target.value)}
-        className="mb-4 border border-gray-300 rounded px-2 py-1 w-full"
-      >
-        <option value="">Select a category...</option>
-        <option value="Technical Skills">Technical Skills</option>
-        <option value="Professional Development">
-          Professional Development
-        </option>
-        <option value="Project Work">Project Work</option>
-        <option value="Team Collaboration">Team Collaboration</option>
-      </select>
+      <div className="mb-4 flex items-center gap-2 relative">
+        <select
+          value={localData.category}
+          onChange={(e) => handleFieldChange('category', e.target.value)}
+          className="flex-1 border border-gray-300 rounded px-2 py-1"
+        >
+          <option value="">Select a category...</option>
+          <option value="Technical Skills">Technical Skills</option>
+          <option value="Professional Development">
+            Professional Development
+          </option>
+          <option value="Project Work">Project Work</option>
+          <option value="Team Collaboration">Team Collaboration</option>
+        </select>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowCategoryTooltip(!showCategoryTooltip)}
+            className="w-5 h-5 rounded-full border-2 border-gray-400 text-gray-400 flex items-center justify-center text-xs font-bold hover:border-gray-600 hover:text-gray-600 cursor-help flex-shrink-0"
+          >
+            ?
+          </button>
+          {showCategoryTooltip && (
+            <div className="absolute right-0 top-full mt-1 bg-gray-800 text-white text-sm rounded-lg p-3 shadow-lg z-10 w-80">
+              <p className="mb-2">
+                Categories help you organize your learning activities into key
+                areas of development.
+              </p>
+              <p className="text-xs text-gray-300">
+                View the{' '}
+                <a href="#" className="underline hover:text-blue-300">
+                  category guide image
+                </a>{' '}
+                for detailed explanations of each category.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {sections.map((section, index) => (
         <div
