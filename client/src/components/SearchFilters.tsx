@@ -69,7 +69,7 @@ const SearchFilters = () => {
           <div key={filter.label} className="flex flex-col gap-1">
             <label className="text-sm font-medium">{filter.label}</label>
             <select className="border rounded-lg p-2">
-              <option value=""></option>
+              <option value="">All</option>
               {filter.options.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

@@ -174,8 +174,14 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-3/4 max-h-[90vh] flex flex-col">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg w-3/4 max-h-[90vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-8 overflow-y-auto flex-1">{renderView()}</div>
 
         <div className="flex justify-end gap-2 p-4 border-t border-gray-200 bg-white rounded-b-lg">
