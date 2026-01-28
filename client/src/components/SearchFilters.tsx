@@ -13,11 +13,16 @@ const SearchFilters = () => {
       ]
     },
     {
-      label: 'Duration',
+      label: 'Tags',
       options: [
-        { value: '0-2', label: '0-2 hours' },
-        { value: '2-4', label: '2-4 hours' },
-        { value: '4+', label: '4+ hours' }
+        { value: 'Learning', label: 'Learning' },
+        { value: 'Development', label: 'Development' },
+        { value: 'Research', label: 'Research' },
+        { value: 'Mentoring', label: 'Mentoring' },
+        { value: 'Documentation', label: 'Documentation' },
+        { value: 'Testing', label: 'Testing' },
+        { value: 'Meeting', label: 'Meeting' },
+        { value: 'Review', label: 'Review' }
       ]
     },
     {
