@@ -98,7 +98,7 @@ const EditEntryView = ({
           <button
             type="button"
             onClick={() => setShowCategoryTooltip(!showCategoryTooltip)}
-            className="w-5 h-5 rounded-full border-2 border-gray-400 text-gray-400 flex items-center justify-center text-xs font-bold hover:border-gray-600 hover:text-gray-600 cursor-help flex-shrink-0"
+            className="w-5 h-5 rounded-full !border-2 !border-blue-500 !bg-white !text-blue-500 flex items-center justify-center text-xs font-bold hover:!border-blue-600 hover:!text-blue-600 cursor-help flex-shrink-0"
           >
             ?
           </button>
