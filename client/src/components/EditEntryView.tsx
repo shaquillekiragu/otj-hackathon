@@ -70,6 +70,7 @@ const EditEntryView = ({
           type="text"
           value={localData.title}
           onChange={(e) => handleFieldChange('title', e.target.value)}
+          placeholder="Title..."
           className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 w-2/3"
         />
         <p className="text-sm text-gray-600">
@@ -77,12 +78,19 @@ const EditEntryView = ({
         </p>
       </div>
 
-      <input
-        type="text"
+      <select
         value={localData.category}
         onChange={(e) => handleFieldChange('category', e.target.value)}
         className="mb-4 border border-gray-300 rounded px-2 py-1 w-full"
-      />
+      >
+        <option value="">Select a category...</option>
+        <option value="Technical Skills">Technical Skills</option>
+        <option value="Professional Development">
+          Professional Development
+        </option>
+        <option value="Project Work">Project Work</option>
+        <option value="Team Collaboration">Team Collaboration</option>
+      </select>
 
       {sections.map((section, index) => (
         <div
