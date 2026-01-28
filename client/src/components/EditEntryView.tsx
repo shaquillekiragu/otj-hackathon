@@ -2,46 +2,67 @@ import { useState } from 'react'
 import TimesheetSection from './TimesheetSection'
 import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
-import { PLACEHOLDER_TAGS, type Tag } from '../types/journal'
+import { type Tag } from '../types/journal'
+import { type JournalEntry } from '../utils/journalData'
 
-function EditEntryView() {
+interface EditEntryViewProps {
+  entryData: JournalEntry | null
+  onUpdate: (updates: Partial<JournalEntry>) => void
+  onTagsUpdate: (tags: Tag[]) => void
+}
+
+const EditEntryView = ({
+  entryData,
+  onUpdate,
+  onTagsUpdate
+}: EditEntryViewProps) => {
   const timesheetProps = useTimesheetManagement()
 
-  const [entryData, setEntryData] = useState({
-    title: 'Entry Title',
-    category: 'Category Name',
-    learningAims: 'Placeholder text for learning aims',
-    learningMethod: 'Placeholder text for learning method',
-    impact: 'Placeholder text for impact'
+  // Local state for form fields
+  const [localData, setLocalData] = useState({
+    title: entryData?.title || '',
+    category: entryData?.category || '',
+    learningAims: entryData?.learningAims || '',
+    learningMethod: entryData?.learningMethod || '',
+    impact: entryData?.impact || ''
   })
 
-  // Placeholder: selected tags for this entry (will come from API)
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([
-    PLACEHOLDER_TAGS[0],
-    PLACEHOLDER_TAGS[2],
-    PLACEHOLDER_TAGS[4]
-  ])
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(
+    entryData?.selectedTags || []
+  )
+
+  const [showCategoryTooltip, setShowCategoryTooltip] = useState(false)
+
+  const handleFieldChange = (field: keyof typeof localData, value: string) => {
+    const updated = { ...localData, [field]: value }
+    setLocalData(updated)
+    onUpdate(updated)
+  }
 
   const addTag = (tag: Tag) => {
     if (!selectedTags.find((t) => t.id === tag.id)) {
-      setSelectedTags([...selectedTags, tag])
+      const updatedTags = [...selectedTags, tag]
+      setSelectedTags(updatedTags)
+      onTagsUpdate(updatedTags)
     }
   }
 
   const removeTag = (tagId: string) => {
-    setSelectedTags(selectedTags.filter((t) => t.id !== tagId))
+    const updatedTags = selectedTags.filter((t) => t.id !== tagId)
+    setSelectedTags(updatedTags)
+    onTagsUpdate(updatedTags)
   }
 
   const sections = [
     {
       title: 'What you were aiming to learn',
-      field: 'learningAims' as keyof typeof entryData
+      field: 'learningAims' as keyof typeof localData
     },
     {
       title: 'How you learnt it',
-      field: 'learningMethod' as keyof typeof entryData
+      field: 'learningMethod' as keyof typeof localData
     },
-    { title: 'What was the impact', field: 'impact' as keyof typeof entryData }
+    { title: 'What was the impact', field: 'impact' as keyof typeof localData }
   ]
 
   return (
@@ -49,25 +70,55 @@ function EditEntryView() {
       <div className="flex justify-between items-start mb-2">
         <input
           type="text"
-          value={entryData.title}
-          onChange={(e) =>
-            setEntryData({ ...entryData, title: e.target.value })
-          }
+          value={localData.title}
+          onChange={(e) => handleFieldChange('title', e.target.value)}
+          placeholder="Title..."
           className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 w-2/3"
         />
         <p className="text-sm text-gray-600">
-          Latest time sheet update: 17/01/26
+          Latest time sheet update: {entryData?.lastTimesheetUpdate || 'N/A'}
         </p>
       </div>
 
-      <input
-        type="text"
-        value={entryData.category}
-        onChange={(e) =>
-          setEntryData({ ...entryData, category: e.target.value })
-        }
-        className="mb-4 border border-gray-300 rounded px-2 py-1 w-full"
-      />
+      <div className="mb-4 flex items-center gap-2 relative">
+        <select
+          value={localData.category}
+          onChange={(e) => handleFieldChange('category', e.target.value)}
+          className="flex-1 border border-gray-300 rounded px-2 py-1"
+        >
+          <option value="">Select a category...</option>
+          <option value="Technical Skills">Technical Skills</option>
+          <option value="Professional Development">
+            Professional Development
+          </option>
+          <option value="Project Work">Project Work</option>
+          <option value="Team Collaboration">Team Collaboration</option>
+        </select>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowCategoryTooltip(!showCategoryTooltip)}
+            className="w-5 h-5 rounded-full !border-2 !border-blue-500 !bg-white !text-blue-500 flex items-center justify-center text-xs font-bold hover:!border-blue-600 hover:!text-blue-600 cursor-help flex-shrink-0"
+          >
+            ?
+          </button>
+          {showCategoryTooltip && (
+            <div className="absolute right-0 top-full mt-1 bg-gray-800 text-white text-sm rounded-lg p-3 shadow-lg z-10 w-80">
+              <p className="mb-2">
+                Categories help you organize your learning activities into key
+                areas of development.
+              </p>
+              <p className="text-xs text-gray-300">
+                View the{' '}
+                <a href="#" className="underline hover:text-blue-300">
+                  category guide image
+                </a>{' '}
+                for detailed explanations of each category.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {sections.map((section, index) => (
         <div
@@ -78,10 +129,8 @@ function EditEntryView() {
             {section.title}
           </h3>
           <textarea
-            value={entryData[section.field]}
-            onChange={(e) =>
-              setEntryData({ ...entryData, [section.field]: e.target.value })
-            }
+            value={localData[section.field]}
+            onChange={(e) => handleFieldChange(section.field, e.target.value)}
             className="w-full border border-gray-300 rounded px-2 py-1 min-h-20"
           />
         </div>

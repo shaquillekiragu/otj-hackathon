@@ -10,12 +10,17 @@ interface TimesheetSectionProps {
   setIsAddingTimesheet: (value: boolean) => void
   setNewEntry: (entry: NewTimesheetEntry) => void
   handleSaveTimesheet: () => void
+  handleDeleteTimesheet: (id: string) => void
+  handleEditTimesheet: (
+    id: string,
+    updatedEntry: Omit<TimesheetEntry, 'id'>
+  ) => void
   closeTimesheetForm: () => void
   goToPreviousPage: () => void
   goToNextPage: () => void
 }
 
-function TimesheetSection({
+const TimesheetSection = ({
   currentPage,
   isAddingTimesheet,
   newEntry,
@@ -23,10 +28,12 @@ function TimesheetSection({
   setIsAddingTimesheet,
   setNewEntry,
   handleSaveTimesheet,
+  handleDeleteTimesheet,
+  handleEditTimesheet,
   closeTimesheetForm,
   goToPreviousPage,
   goToNextPage
-}: TimesheetSectionProps) {
+}: TimesheetSectionProps) => {
   const paginationButtonClass =
     'px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
 
@@ -60,35 +67,49 @@ function TimesheetSection({
             onCancel={closeTimesheetForm}
           />
         )}
-        {timesheetEntries[currentPage]?.map((entry, index) => (
-          <TimesheetEntryCard
-            key={index}
-            date={entry.date}
-            timeStarted={entry.timeStarted}
-            timeFinished={entry.timeFinished}
-            duration={entry.duration}
-          />
-        ))}
+        {!isAddingTimesheet && timesheetEntries.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+            <p className="mb-2">No timesheet entries yet</p>
+            <p className="text-sm">
+              Click "Add timesheet" to create your first entry
+            </p>
+          </div>
+        ) : (
+          timesheetEntries[currentPage]?.map((entry) => (
+            <TimesheetEntryCard
+              key={entry.id}
+              id={entry.id}
+              date={entry.date}
+              timeStarted={entry.timeStarted}
+              timeFinished={entry.timeFinished}
+              duration={entry.duration}
+              onDelete={handleDeleteTimesheet}
+              onEdit={handleEditTimesheet}
+            />
+          ))
+        )}
       </div>
-      <div className="flex justify-center items-center gap-4 mt-3">
-        <button
-          onClick={goToPreviousPage}
-          disabled={currentPage === 0}
-          className={paginationButtonClass}
-        >
-          ←
-        </button>
-        <span className="text-sm text-gray-600">
-          {currentPage + 1}/{timesheetEntries.length}
-        </span>
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage === timesheetEntries.length - 1}
-          className={paginationButtonClass}
-        >
-          →
-        </button>
-      </div>
+      {timesheetEntries.length > 0 && (
+        <div className="flex justify-center items-center gap-4 mt-3">
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 0}
+            className={paginationButtonClass}
+          >
+            ←
+          </button>
+          <span className="text-sm text-gray-600">
+            {currentPage + 1}/{timesheetEntries.length}
+          </span>
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === timesheetEntries.length - 1}
+            className={paginationButtonClass}
+          >
+            →
+          </button>
+        </div>
+      )}
     </div>
   )
 }

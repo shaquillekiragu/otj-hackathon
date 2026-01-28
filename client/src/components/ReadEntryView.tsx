@@ -1,40 +1,37 @@
 import TimesheetSection from './TimesheetSection'
 import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
-import { PLACEHOLDER_TAGS } from '../types/journal'
+import { type JournalEntry } from '../utils/journalData'
 
-function ReadEntryView() {
+interface ReadEntryViewProps {
+  entryData: JournalEntry
+}
+
+const ReadEntryView = ({ entryData }: ReadEntryViewProps) => {
   const timesheetProps = useTimesheetManagement()
-
-  // Placeholder: selected tags for this entry (will come from API)
-  const selectedTags = [
-    PLACEHOLDER_TAGS[0],
-    PLACEHOLDER_TAGS[2],
-    PLACEHOLDER_TAGS[4]
-  ]
 
   const sections = [
     {
       title: 'What you were aiming to learn',
-      content: 'Placeholder text for learning aims'
+      content: entryData.learningAims
     },
     {
       title: 'How you learnt it',
-      content: 'Placeholder text for learning method'
+      content: entryData.learningMethod
     },
-    { title: 'What was the impact', content: 'Placeholder text for impact' }
+    { title: 'What was the impact', content: entryData.impact }
   ]
 
   return (
     <>
       <div className="flex justify-between items-start mb-2">
-        <h2 className="text-2xl font-bold">Entry Title</h2>
+        <h2 className="text-2xl font-bold">{entryData.title}</h2>
         <p className="text-sm text-gray-600">
-          Latest time sheet update: 17/01/26
+          Latest time sheet update: {entryData.lastTimesheetUpdate}
         </p>
       </div>
 
-      <p className="mb-4">Category Name</p>
+      <p className="mb-4">{entryData.category}</p>
 
       {sections.map((section, index) => (
         <div
@@ -50,7 +47,7 @@ function ReadEntryView() {
 
       <TimesheetSection {...timesheetProps} />
 
-      <TagSection selectedTags={selectedTags} mode="read" />
+      <TagSection selectedTags={entryData.selectedTags} mode="read" />
     </>
   )
 }

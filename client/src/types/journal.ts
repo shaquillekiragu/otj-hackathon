@@ -15,3 +15,24 @@ export const PLACEHOLDER_TAGS: Tag[] = [
   { id: '7', name: 'Meeting', hexColor: '#14B8A6' },
   { id: '8', name: 'Review', hexColor: '#6366F1' }
 ]
+
+export const PLACEHOLDER_ENTRIES = [
+  {
+    id: '1',
+    title: 'Entry 1',
+    description: 'Description for entry 1',
+    date: '2026-01-26'
+  },
+  {
+    id: '2',
+    title: 'Entry 2',
+    description: 'Description for entry 2',
+    date: '2026-01-24'
+  },
+  {
+    id: '3',
+    title: 'Entry 3',
+    description: 'Description for entry 3',
+    date: '2026-01-20'
+  }
+]
