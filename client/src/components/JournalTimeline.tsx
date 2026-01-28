@@ -1,17 +1,19 @@
 import JournalListCard from './JournalListCard'
+import { PLACEHOLDER_ENTRIES } from '../types/journal'
 
 interface JournalEntry {
-  id: number
+  id: string
   title: string
   description: string
   date: string
 }
 
 interface JournalTimelineProps {
-  entries: JournalEntry[]
+  handleClick: (id: string) => void
 }
 
-const JournalTimeline = ({ entries }: JournalTimelineProps) => {
+const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
+  const entries: JournalEntry[] = PLACEHOLDER_ENTRIES
   return (
     <div className="flex flex-col w-full px-8">
       {entries.map((entry, index) => (
@@ -32,7 +34,8 @@ const JournalTimeline = ({ entries }: JournalTimelineProps) => {
             )}
           </div>
           {/* Card */}
-          <div className="flex-1">
+          <div className="flex-1" onClick={() => handleClick(entry.id)}>
+            {/* CLICKING A JOURNAL CARD SHOULD OPEN THE VIEW MODAL WITH THE ID PASSED AS A PROP */}
             <JournalListCard />
           </div>
         </div>

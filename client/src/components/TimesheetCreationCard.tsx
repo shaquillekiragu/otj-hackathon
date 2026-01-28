@@ -11,7 +11,7 @@ interface TimesheetCreationCardProps {
   onCancel: () => void
 }
 
-function TimesheetCreationCard({
+const TimesheetCreationCard = ({
   date,
   timeStarted,
   timeFinished,
@@ -20,7 +20,7 @@ function TimesheetCreationCard({
   onTimeFinishedChange,
   onSave,
   onCancel
-}: TimesheetCreationCardProps) {
+}: TimesheetCreationCardProps) => {
   const calculatedDuration = calculateDuration(timeStarted, timeFinished)
 
   return (

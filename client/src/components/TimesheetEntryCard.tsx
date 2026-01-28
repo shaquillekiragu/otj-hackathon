@@ -5,12 +5,12 @@ interface TimesheetEntryCardProps {
   duration: string
 }
 
-function TimesheetEntryCard({
+const TimesheetEntryCard = ({
   date,
   timeStarted,
   timeFinished,
   duration
-}: TimesheetEntryCardProps) {
+}: TimesheetEntryCardProps) => {
   return (
     <div className="border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 hover:bg-gray-100 transition-colors">
       <div className="flex items-center gap-6">

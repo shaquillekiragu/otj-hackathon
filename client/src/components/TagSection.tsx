@@ -11,13 +11,13 @@ interface TagSectionProps {
   onDeleteTag?: (tagId: string) => void
 }
 
-function TagSection({
+const TagSection = ({
   selectedTags,
   mode,
   onAddTag,
   onRemoveTag,
   onDeleteTag
-}: TagSectionProps) {
+}: TagSectionProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedColor, setSelectedColor] = useState('#3B82F6')

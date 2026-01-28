@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import ReadEntryView from './ReadEntryView'
 import EditEntryView from './EditEntryView'
+import { getJournalEntryById, type JournalEntry } from '../utils/journalData'
+import { type Tag } from '../types/journal'
 
-type ModalView = 'readEntry' | 'create' | 'edit'
+type ModalView = 'readEntry' | 'edit' | 'create'
 
 interface ModalProps {
   onClose: () => void
-  view?: ModalView
+  entryId: string
 }
 
 interface ButtonConfig {
@@ -23,8 +25,29 @@ const buttonStyles = {
   secondary: '!bg-gray-200 !text-gray-800 hover:!bg-gray-300'
 }
 
-function Modal({ onClose, view: initialView = 'readEntry' }: ModalProps) {
+const Modal = ({ onClose, entryId }: ModalProps) => {
+  const initialView = entryId ? 'readEntry' : 'create'
   const [view, setView] = useState<ModalView>(initialView)
+  const [entryData, setEntryData] = useState<JournalEntry | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Fetch entry data if entryId exists
+  useEffect(() => {
+    const fetchEntry = async () => {
+      if (entryId) {
+        setIsLoading(true)
+        try {
+          const data = await getJournalEntryById(entryId)
+          setEntryData(data)
+        } catch (error) {
+          console.error('Failed to fetch entry:', error)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    }
+    fetchEntry()
+  }, [entryId])
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -33,9 +56,27 @@ function Modal({ onClose, view: initialView = 'readEntry' }: ModalProps) {
     }
   }, [])
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // TODO: Implement save logic
-    console.log('Save entry')
+    console.log('Save entry', entryData)
+
+    // If editing an existing entry, refetch the data
+    if (entryId && view === 'edit') {
+      try {
+        const data = await getJournalEntryById(entryId)
+        setEntryData(data)
+        setView('readEntry')
+      } catch (error) {
+        console.error('Failed to refetch entry:', error)
+      }
+    } else {
+      // For create mode, close the modal after save
+      onClose()
+    }
+  }
+
+  const handleDiscard = () => {
+    onClose()
   }
 
   const handleDelete = () => {
@@ -44,9 +85,27 @@ function Modal({ onClose, view: initialView = 'readEntry' }: ModalProps) {
   }
 
   const getFooterButtons = (): ButtonConfig[] => {
+    if (view === 'create') {
+      return [
+        {
+          label: 'Save',
+          onClick: handleSave,
+          variant: 'success'
+        },
+        {
+          label: 'Discard',
+          onClick: handleDiscard,
+          variant: 'secondary'
+        }
+      ]
+    }
     if (view === 'edit') {
       return [
-        { label: 'Save', onClick: handleSave, variant: 'success' },
+        {
+          label: 'Save',
+          onClick: handleSave,
+          variant: 'success'
+        },
         {
           label: 'Cancel',
           onClick: () => setView('readEntry'),
@@ -61,15 +120,56 @@ function Modal({ onClose, view: initialView = 'readEntry' }: ModalProps) {
     ]
   }
 
+  const handleEntryUpdate = (updates: Partial<JournalEntry>) => {
+    if (entryData) {
+      setEntryData({ ...entryData, ...updates })
+    }
+  }
+
+  const handleTagsUpdate = (tags: Tag[]) => {
+    if (entryData) {
+      setEntryData({ ...entryData, selectedTags: tags })
+    }
+  }
+
   const renderView = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      )
+    }
+
+    if (entryId && !entryData) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Entry not found</p>
+        </div>
+      )
+    }
+
     switch (view) {
       case 'readEntry':
-        return <ReadEntryView />
-      case 'create':
+        return entryData ? <ReadEntryView entryData={entryData} /> : null
       case 'edit':
-        return <EditEntryView />
+        return entryData ? (
+          <EditEntryView
+            entryData={entryData}
+            onUpdate={handleEntryUpdate}
+            onTagsUpdate={handleTagsUpdate}
+          />
+        ) : null
+      case 'create':
+        return (
+          <EditEntryView
+            entryData={null}
+            onUpdate={handleEntryUpdate}
+            onTagsUpdate={handleTagsUpdate}
+          />
+        )
       default:
-        return <ReadEntryView />
+        return entryData ? <ReadEntryView entryData={entryData} /> : null
     }
   }
 
