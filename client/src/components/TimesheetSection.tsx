@@ -4,9 +4,10 @@ import type { TimesheetEntry, NewTimesheetEntry } from '../types/timesheet'
 
 interface TimesheetSectionProps {
   currentPage: number
+  totalPages: number
   isAddingTimesheet: boolean
   newEntry: NewTimesheetEntry
-  timesheetEntries: TimesheetEntry[][]
+  timesheetEntries: TimesheetEntry[]
   setIsAddingTimesheet: (value: boolean) => void
   setNewEntry: (entry: NewTimesheetEntry) => void
   handleSaveTimesheet: () => void
@@ -22,6 +23,7 @@ interface TimesheetSectionProps {
 
 const TimesheetSection = ({
   currentPage,
+  totalPages,
   isAddingTimesheet,
   newEntry,
   timesheetEntries,
@@ -75,7 +77,7 @@ const TimesheetSection = ({
             </p>
           </div>
         ) : (
-          timesheetEntries[currentPage]?.map((entry) => (
+          timesheetEntries.map((entry) => (
             <TimesheetEntryCard
               key={entry.id}
               id={entry.id}
@@ -93,17 +95,17 @@ const TimesheetSection = ({
         <div className="flex justify-center items-center gap-4 mt-3">
           <button
             onClick={goToPreviousPage}
-            disabled={currentPage === 0}
+            disabled={currentPage === 1}
             className={paginationButtonClass}
           >
             ←
           </button>
           <span className="text-sm text-gray-600">
-            {currentPage + 1}/{timesheetEntries.length}
+            {currentPage}/{totalPages}
           </span>
           <button
             onClick={goToNextPage}
-            disabled={currentPage === timesheetEntries.length - 1}
+            disabled={currentPage === totalPages}
             className={paginationButtonClass}
           >
             →

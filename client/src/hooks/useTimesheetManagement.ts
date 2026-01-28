@@ -5,55 +5,27 @@ import {
   formatDateForDisplay
 } from '../utils/timeCalculations'
 
-export const useTimesheetManagement = () => {
-  const [currentPage, setCurrentPage] = useState(0)
+interface UseTimesheetManagementProps {
+  initialEntries: TimesheetEntry[]
+  fetchTimesheets: (page: number) => Promise<void>
+  totalPages: number
+  currentPage: number
+}
+
+export const useTimesheetManagement = ({
+  initialEntries,
+  fetchTimesheets,
+  totalPages,
+  currentPage
+}: UseTimesheetManagementProps) => {
   const [isAddingTimesheet, setIsAddingTimesheet] = useState(false)
   const [newEntry, setNewEntry] = useState<NewTimesheetEntry>({
     date: '',
     timeStarted: '',
     timeFinished: ''
   })
-  const [timesheetEntries, setTimesheetEntries] = useState<TimesheetEntry[][]>([
-    [
-      {
-        id: '1',
-        date: '21 Jan 2026',
-        timeStarted: '14:00',
-        timeFinished: '16:30',
-        duration: '2h 30m'
-      },
-      {
-        id: '2',
-        date: '20 Jan 2026',
-        timeStarted: '09:30',
-        timeFinished: '12:00',
-        duration: '2h 30m'
-      },
-      {
-        id: '3',
-        date: '17 Jan 2026',
-        timeStarted: '10:00',
-        timeFinished: '12:00',
-        duration: '2h'
-      }
-    ],
-    [
-      {
-        id: '4',
-        date: '16 Jan 2026',
-        timeStarted: '13:00',
-        timeFinished: '15:45',
-        duration: '2h 45m'
-      },
-      {
-        id: '5',
-        date: '15 Jan 2026',
-        timeStarted: '09:00',
-        timeFinished: '11:30',
-        duration: '2h 30m'
-      }
-    ]
-  ])
+
+  const timesheetEntries = initialEntries
 
   const closeTimesheetForm = () => {
     setIsAddingTimesheet(false)
@@ -61,6 +33,7 @@ export const useTimesheetManagement = () => {
   }
 
   const handleSaveTimesheet = () => {
+    // TODO: API call to save timesheet entry
     const newTimesheetEntry: TimesheetEntry = {
       id: Date.now().toString(),
       date: formatDateForDisplay(newEntry.date),
@@ -69,11 +42,10 @@ export const useTimesheetManagement = () => {
       duration: calculateDuration(newEntry.timeStarted, newEntry.timeFinished)
     }
 
-    // Add to the start of the first page
-    setTimesheetEntries((prev) => {
-      const updatedFirstPage = [newTimesheetEntry, ...prev[0]]
-      return [updatedFirstPage, ...prev.slice(1)]
-    })
+    console.log('Save timesheet entry:', newTimesheetEntry)
+
+    // Navigate to first page to see the new entry after API call
+    fetchTimesheets(1)
 
     closeTimesheetForm()
   }
@@ -92,16 +64,21 @@ export const useTimesheetManagement = () => {
   }
 
   const goToPreviousPage = () => {
-    setCurrentPage((prev) => prev - 1)
+    if (currentPage > 1) {
+      fetchTimesheets(currentPage - 1)
+    }
   }
 
   const goToNextPage = () => {
-    setCurrentPage((prev) => prev + 1)
+    if (currentPage < totalPages) {
+      fetchTimesheets(currentPage + 1)
+    }
   }
 
   return {
     // State
     currentPage,
+    totalPages,
     isAddingTimesheet,
     newEntry,
     timesheetEntries,

@@ -2,13 +2,29 @@ import TimesheetSection from './TimesheetSection'
 import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
 import { type JournalEntry } from '../utils/journalData'
+import { type TimesheetEntry } from '../types/timesheet'
 
 interface ReadEntryViewProps {
   entryData: JournalEntry
+  timesheetEntries: TimesheetEntry[]
+  fetchTimesheets: (page: number) => Promise<void>
+  totalPages: number
+  currentPage: number
 }
 
-const ReadEntryView = ({ entryData }: ReadEntryViewProps) => {
-  const timesheetProps = useTimesheetManagement()
+const ReadEntryView = ({
+  entryData,
+  timesheetEntries,
+  fetchTimesheets,
+  totalPages,
+  currentPage
+}: ReadEntryViewProps) => {
+  const timesheetProps = useTimesheetManagement({
+    initialEntries: timesheetEntries,
+    fetchTimesheets,
+    totalPages,
+    currentPage
+  })
 
   const sections = [
     {

@@ -4,19 +4,33 @@ import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
 import { type Tag } from '../types/journal'
 import { type JournalEntry } from '../utils/journalData'
+import { type TimesheetEntry } from '../types/timesheet'
 
 interface EditEntryViewProps {
   entryData: JournalEntry | null
   onUpdate: (updates: Partial<JournalEntry>) => void
   onTagsUpdate: (tags: Tag[]) => void
+  timesheetEntries: TimesheetEntry[]
+  fetchTimesheets: (page: number) => Promise<void>
+  totalPages: number
+  currentPage: number
 }
 
 const EditEntryView = ({
   entryData,
   onUpdate,
-  onTagsUpdate
+  onTagsUpdate,
+  timesheetEntries,
+  fetchTimesheets,
+  totalPages,
+  currentPage
 }: EditEntryViewProps) => {
-  const timesheetProps = useTimesheetManagement()
+  const timesheetProps = useTimesheetManagement({
+    initialEntries: timesheetEntries,
+    fetchTimesheets,
+    totalPages,
+    currentPage
+  })
 
   // Local state for form fields
   const [localData, setLocalData] = useState({
