@@ -1,4 +1,5 @@
 export interface TimesheetEntry {
+  id: string
   date: string
   timeStarted: string
   timeFinished: string

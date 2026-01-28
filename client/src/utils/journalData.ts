@@ -33,18 +33,21 @@ const JOURNAL_ENTRIES: JournalEntry[] = [
     ],
     timesheetEntries: [
       {
+        id: 'ts-1-1',
         date: '2026-01-20',
         timeStarted: '09:00',
         timeFinished: '11:30',
         duration: '2h 30m'
       },
       {
+        id: 'ts-1-2',
         date: '2026-01-22',
         timeStarted: '10:00',
         timeFinished: '13:00',
         duration: '3h'
       },
       {
+        id: 'ts-1-3',
         date: '2026-01-26',
         timeStarted: '09:00',
         timeFinished: '13:00',
@@ -70,18 +73,21 @@ const JOURNAL_ENTRIES: JournalEntry[] = [
     ],
     timesheetEntries: [
       {
+        id: 'ts-2-1',
         date: '2026-01-15',
         timeStarted: '09:00',
         timeFinished: '13:00',
         duration: '4h'
       },
       {
+        id: 'ts-2-2',
         date: '2026-01-18',
         timeStarted: '10:00',
         timeFinished: '13:30',
         duration: '3h 30m'
       },
       {
+        id: 'ts-2-3',
         date: '2026-01-24',
         timeStarted: '09:00',
         timeFinished: '14:00',
@@ -107,18 +113,21 @@ const JOURNAL_ENTRIES: JournalEntry[] = [
     ],
     timesheetEntries: [
       {
+        id: 'ts-3-1',
         date: '2026-01-10',
         timeStarted: '10:00',
         timeFinished: '13:00',
         duration: '3h'
       },
       {
+        id: 'ts-3-2',
         date: '2026-01-15',
         timeStarted: '09:00',
         timeFinished: '13:30',
         duration: '4h 30m'
       },
       {
+        id: 'ts-3-3',
         date: '2026-01-20',
         timeStarted: '09:00',
         timeFinished: '15:00',

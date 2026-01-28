@@ -10,6 +10,11 @@ interface TimesheetSectionProps {
   setIsAddingTimesheet: (value: boolean) => void
   setNewEntry: (entry: NewTimesheetEntry) => void
   handleSaveTimesheet: () => void
+  handleDeleteTimesheet: (id: string) => void
+  handleEditTimesheet: (
+    id: string,
+    updatedEntry: Omit<TimesheetEntry, 'id'>
+  ) => void
   closeTimesheetForm: () => void
   goToPreviousPage: () => void
   goToNextPage: () => void
@@ -23,6 +28,8 @@ const TimesheetSection = ({
   setIsAddingTimesheet,
   setNewEntry,
   handleSaveTimesheet,
+  handleDeleteTimesheet,
+  handleEditTimesheet,
   closeTimesheetForm,
   goToPreviousPage,
   goToNextPage
@@ -68,13 +75,16 @@ const TimesheetSection = ({
             </p>
           </div>
         ) : (
-          timesheetEntries[currentPage]?.map((entry, index) => (
+          timesheetEntries[currentPage]?.map((entry) => (
             <TimesheetEntryCard
-              key={index}
+              key={entry.id}
+              id={entry.id}
               date={entry.date}
               timeStarted={entry.timeStarted}
               timeFinished={entry.timeFinished}
               duration={entry.duration}
+              onDelete={handleDeleteTimesheet}
+              onEdit={handleEditTimesheet}
             />
           ))
         )}
