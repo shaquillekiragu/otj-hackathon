@@ -5,35 +5,6 @@ import type { JournalEntry } from '../utils/journalData'
 const API_BASE_URL = 'http://localhost:8080/api'
 const USER_ID = '64eea3f8b1234567890abcde'
 
-// API response types
-interface ApiTag {
-  _id: string
-  tagDescription: string
-  tagColour: string
-}
-
-interface ApiTimeSheet {
-  date: string
-  startTime: string
-  endTime: string
-  duration: number
-}
-
-interface ApiDescription {
-  intend?: string
-  implementation?: string
-  impact?: string
-}
-
-interface ApiJournalEntry {
-  _id: string
-  title: string
-  category: string
-  description?: ApiDescription
-  timeSheets?: ApiTimeSheet[]
-  tags?: ApiTag[]
-}
-
 export const useJournalEntries = () => {
   const [entries, setEntries] = useState<JournalEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,51 +22,12 @@ export const useJournalEntries = () => {
       })
 
       if (response.data.success && response.data.journalEntries) {
-        // Transform API response to match client format
+        // Transform _id to id for client consistency
         const transformedEntries = response.data.journalEntries.entries.map(
-          (entry: ApiJournalEntry) => ({
+          (entry: any) => ({
+            ...entry,
             id: entry._id,
-            title: entry.title,
-            category: entry.category,
-            learningAims: entry.description?.intend || '',
-            learningMethod: entry.description?.implementation || '',
-            impact: entry.description?.impact || '',
-            lastTimesheetUpdate:
-              entry.timeSheets && entry.timeSheets.length > 0
-                ? new Date(
-                    entry.timeSheets[entry.timeSheets.length - 1].date
-                  ).toLocaleDateString('en-GB')
-                : new Date().toLocaleDateString('en-GB'),
-            selectedTags: entry.tags
-              ? entry.tags.map((tag: ApiTag, tagIndex: number) => ({
-                  id: tag._id || `${entry._id}-tag-${tagIndex}`,
-                  name: tag.tagDescription,
-                  hexColor: tag.tagColour
-                }))
-              : [],
-            timesheetEntries: entry.timeSheets
-              ? entry.timeSheets.map((ts: ApiTimeSheet, index: number) => ({
-                  id: `${entry._id}-ts-${index}`,
-                  date: new Date(ts.date).toISOString().split('T')[0],
-                  timeStarted: new Date(ts.startTime).toLocaleTimeString(
-                    'en-GB',
-                    {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: false
-                    }
-                  ),
-                  timeFinished: new Date(ts.endTime).toLocaleTimeString(
-                    'en-GB',
-                    {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: false
-                    }
-                  ),
-                  duration: `${Math.floor(ts.duration / 60)}h ${ts.duration % 60}m`
-                }))
-              : []
+            tags: entry.tags?.map((tag: any) => ({ ...tag, id: tag._id })) || []
           })
         )
         setEntries(transformedEntries)

@@ -1,27 +1,27 @@
-import { calculateDuration } from '../utils/timeCalculations'
+import { calculateDuration, formatDuration } from '../utils/timeCalculations'
 
 interface TimesheetCreationCardProps {
   date: string
-  timeStarted: string
-  timeFinished: string
+  startTime: string
+  endTime: string
   onDateChange: (date: string) => void
-  onTimeStartedChange: (time: string) => void
-  onTimeFinishedChange: (time: string) => void
+  onStartTimeChange: (time: string) => void
+  onEndTimeChange: (time: string) => void
   onSave: () => void
   onCancel: () => void
 }
 
 const TimesheetCreationCard = ({
   date,
-  timeStarted,
-  timeFinished,
+  startTime,
+  endTime,
   onDateChange,
-  onTimeStartedChange,
-  onTimeFinishedChange,
+  onStartTimeChange,
+  onEndTimeChange,
   onSave,
   onCancel
 }: TimesheetCreationCardProps) => {
-  const calculatedDuration = calculateDuration(timeStarted, timeFinished)
+  const calculatedDuration = calculateDuration(startTime, endTime)
 
   return (
     <div className="border border-blue-300 rounded-lg px-4 py-3 bg-blue-50">
@@ -39,8 +39,8 @@ const TimesheetCreationCard = ({
           <label className="text-xs text-gray-500 font-medium">Started:</label>
           <input
             type="time"
-            value={timeStarted}
-            onChange={(e) => onTimeStartedChange(e.target.value)}
+            value={startTime}
+            onChange={(e) => onStartTimeChange(e.target.value)}
             className="text-sm px-2 py-1 border border-gray-300 rounded"
           />
         </div>
@@ -48,15 +48,15 @@ const TimesheetCreationCard = ({
           <label className="text-xs text-gray-500 font-medium">Finished:</label>
           <input
             type="time"
-            value={timeFinished}
-            onChange={(e) => onTimeFinishedChange(e.target.value)}
+            value={endTime}
+            onChange={(e) => onEndTimeChange(e.target.value)}
             className="text-sm px-2 py-1 border border-gray-300 rounded"
           />
         </div>
         <div className="flex flex-col gap-1 flex-1">
           <label className="text-xs text-gray-500 font-medium">Duration:</label>
           <div className="text-sm px-2 py-1 font-semibold">
-            {calculatedDuration || '-'}
+            {formatDuration(calculatedDuration) || '-'}
           </div>
         </div>
         <div className="flex gap-2 items-end">

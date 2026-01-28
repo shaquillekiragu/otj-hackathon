@@ -36,21 +36,36 @@ const EditEntryView = ({
   const [localData, setLocalData] = useState({
     title: entryData?.title || '',
     category: entryData?.category || '',
-    learningAims: entryData?.learningAims || '',
-    learningMethod: entryData?.learningMethod || '',
-    impact: entryData?.impact || ''
+    intend: entryData?.description.intend || '',
+    implementation: entryData?.description.implementation || '',
+    impact: entryData?.description.impact || ''
   })
 
-  const [selectedTags, setSelectedTags] = useState<Tag[]>(
-    entryData?.selectedTags || []
-  )
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(entryData?.tags || [])
 
   const [showCategoryTooltip, setShowCategoryTooltip] = useState(false)
 
   const handleFieldChange = (field: keyof typeof localData, value: string) => {
     const updated = { ...localData, [field]: value }
     setLocalData(updated)
-    onUpdate(updated)
+
+    // Update with proper description object structure
+    if (
+      field === 'intend' ||
+      field === 'implementation' ||
+      field === 'impact'
+    ) {
+      onUpdate({
+        description: {
+          intend: field === 'intend' ? value : localData.intend,
+          implementation:
+            field === 'implementation' ? value : localData.implementation,
+          impact: field === 'impact' ? value : localData.impact
+        }
+      })
+    } else {
+      onUpdate({ [field]: value })
+    }
   }
 
   const addTag = (tag: Tag) => {
@@ -70,11 +85,11 @@ const EditEntryView = ({
   const sections = [
     {
       title: 'What you were aiming to learn',
-      field: 'learningAims' as keyof typeof localData
+      field: 'intend' as keyof typeof localData
     },
     {
       title: 'How you learnt it',
-      field: 'learningMethod' as keyof typeof localData
+      field: 'implementation' as keyof typeof localData
     },
     { title: 'What was the impact', field: 'impact' as keyof typeof localData }
   ]
@@ -90,7 +105,10 @@ const EditEntryView = ({
           className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 w-2/3"
         />
         <p className="text-sm text-gray-600">
-          Latest time sheet update: {entryData?.lastTimesheetUpdate || 'N/A'}
+          Latest time sheet update:{' '}
+          {entryData
+            ? new Date(entryData.updatedAt).toLocaleDateString('en-GB')
+            : 'N/A'}
         </p>
       </div>
 

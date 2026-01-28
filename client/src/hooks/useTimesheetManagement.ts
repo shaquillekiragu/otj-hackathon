@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import type { TimesheetEntry, NewTimesheetEntry } from '../types/timesheet'
-import {
-  calculateDuration,
-  formatDateForDisplay
-} from '../utils/timeCalculations'
+import { calculateDuration } from '../utils/timeCalculations'
 
 interface UseTimesheetManagementProps {
   initialEntries: TimesheetEntry[]
@@ -21,25 +18,24 @@ export const useTimesheetManagement = ({
   const [isAddingTimesheet, setIsAddingTimesheet] = useState(false)
   const [newEntry, setNewEntry] = useState<NewTimesheetEntry>({
     date: '',
-    timeStarted: '',
-    timeFinished: ''
+    startTime: '',
+    endTime: ''
   })
 
   const timesheetEntries = initialEntries
 
   const closeTimesheetForm = () => {
     setIsAddingTimesheet(false)
-    setNewEntry({ date: '', timeStarted: '', timeFinished: '' })
+    setNewEntry({ date: '', startTime: '', endTime: '' })
   }
 
   const handleSaveTimesheet = () => {
     // TODO: API call to save timesheet entry
     const newTimesheetEntry: TimesheetEntry = {
-      id: Date.now().toString(),
-      date: formatDateForDisplay(newEntry.date),
-      timeStarted: newEntry.timeStarted,
-      timeFinished: newEntry.timeFinished,
-      duration: calculateDuration(newEntry.timeStarted, newEntry.timeFinished)
+      date: newEntry.date,
+      startTime: newEntry.startTime,
+      endTime: newEntry.endTime,
+      duration: calculateDuration(newEntry.startTime, newEntry.endTime)
     }
 
     console.log('Save timesheet entry:', newTimesheetEntry)
@@ -50,17 +46,14 @@ export const useTimesheetManagement = ({
     closeTimesheetForm()
   }
 
-  const handleDeleteTimesheet = (id: string) => {
+  const handleDeleteTimesheet = (entry: TimesheetEntry) => {
     // TODO: API call to delete timesheet entry
-    console.log('Delete timesheet entry:', id)
+    console.log('Delete timesheet entry:', entry)
   }
 
-  const handleEditTimesheet = (
-    id: string,
-    updatedEntry: Omit<TimesheetEntry, 'id'>
-  ) => {
+  const handleEditTimesheet = (updatedEntry: TimesheetEntry) => {
     // TODO: API call to update timesheet entry
-    console.log('Edit timesheet entry:', id, updatedEntry)
+    console.log('Edit timesheet entry:', updatedEntry)
   }
 
   const goToPreviousPage = () => {

@@ -29,13 +29,13 @@ const ReadEntryView = ({
   const sections = [
     {
       title: 'What you were aiming to learn',
-      content: entryData.learningAims
+      content: entryData.description.intend
     },
     {
       title: 'How you learnt it',
-      content: entryData.learningMethod
+      content: entryData.description.implementation
     },
-    { title: 'What was the impact', content: entryData.impact }
+    { title: 'What was the impact', content: entryData.description.impact }
   ]
 
   return (
@@ -43,7 +43,8 @@ const ReadEntryView = ({
       <div className="flex justify-between items-start mb-2">
         <h2 className="text-2xl font-bold">{entryData.title}</h2>
         <p className="text-sm text-gray-600">
-          Latest time sheet update: {entryData.lastTimesheetUpdate}
+          Latest time sheet update:{' '}
+          {new Date(entryData.updatedAt).toLocaleDateString('en-GB')}
         </p>
       </div>
 
@@ -63,7 +64,7 @@ const ReadEntryView = ({
 
       <TimesheetSection {...timesheetProps} />
 
-      <TagSection selectedTags={entryData.selectedTags} mode="read" />
+      <TagSection selectedTags={entryData.tags || []} mode="read" />
     </>
   )
 }

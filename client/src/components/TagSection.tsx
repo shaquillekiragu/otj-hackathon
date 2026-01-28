@@ -27,7 +27,7 @@ const TagSection = ({
   )
 
   const filteredTags = availableTags.filter((tag) =>
-    tag.name.toLowerCase().includes(searchQuery.toLowerCase())
+    tag.tagDescription.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleAddTag = (tag: Tag) => {
@@ -47,8 +47,8 @@ const TagSection = ({
 
     const newTag: Tag = {
       id: `temp-${Date.now()}`,
-      name: searchQuery.trim(),
-      hexColor: selectedColor
+      tagDescription: searchQuery.trim(),
+      tagColour: selectedColor
     }
 
     onAddTag?.(newTag)
@@ -67,7 +67,7 @@ const TagSection = ({
           <span
             key={tag.id}
             className="px-3 py-1 rounded text-white text-sm font-medium flex items-center gap-2"
-            style={{ backgroundColor: tag.hexColor }}
+            style={{ backgroundColor: tag.tagColour }}
           >
             {mode === 'edit' && (
               <button
@@ -78,7 +78,7 @@ const TagSection = ({
                 ×
               </button>
             )}
-            {tag.name}
+            {tag.tagDescription}
           </span>
         ))}
         {mode === 'edit' && (
@@ -109,12 +109,12 @@ const TagSection = ({
                             onClick={() => handleAddTag(tag)}
                             className="!flex-1 !bg-transparent !border-none !text-left !p-0 !m-0 cursor-pointer !text-black"
                           >
-                            {tag.name}
+                            {tag.tagDescription}
                           </button>
                           <div className="flex items-center gap-3">
                             <span
                               className="w-16 h-8 rounded"
-                              style={{ backgroundColor: tag.hexColor }}
+                              style={{ backgroundColor: tag.tagColour }}
                             />
                             <button
                               type="button"

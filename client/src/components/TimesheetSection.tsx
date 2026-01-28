@@ -11,11 +11,8 @@ interface TimesheetSectionProps {
   setIsAddingTimesheet: (value: boolean) => void
   setNewEntry: (entry: NewTimesheetEntry) => void
   handleSaveTimesheet: () => void
-  handleDeleteTimesheet: (id: string) => void
-  handleEditTimesheet: (
-    id: string,
-    updatedEntry: Omit<TimesheetEntry, 'id'>
-  ) => void
+  handleDeleteTimesheet: (entry: TimesheetEntry) => void
+  handleEditTimesheet: (updatedEntry: TimesheetEntry) => void
   closeTimesheetForm: () => void
   goToPreviousPage: () => void
   goToNextPage: () => void
@@ -56,15 +53,13 @@ const TimesheetSection = ({
         {isAddingTimesheet && (
           <TimesheetCreationCard
             date={newEntry.date}
-            timeStarted={newEntry.timeStarted}
-            timeFinished={newEntry.timeFinished}
+            startTime={newEntry.startTime}
+            endTime={newEntry.endTime}
             onDateChange={(date) => setNewEntry({ ...newEntry, date })}
-            onTimeStartedChange={(timeStarted) =>
-              setNewEntry({ ...newEntry, timeStarted })
+            onStartTimeChange={(startTime) =>
+              setNewEntry({ ...newEntry, startTime })
             }
-            onTimeFinishedChange={(timeFinished) =>
-              setNewEntry({ ...newEntry, timeFinished })
-            }
+            onEndTimeChange={(endTime) => setNewEntry({ ...newEntry, endTime })}
             onSave={handleSaveTimesheet}
             onCancel={closeTimesheetForm}
           />
@@ -77,13 +72,12 @@ const TimesheetSection = ({
             </p>
           </div>
         ) : (
-          timesheetEntries.map((entry) => (
+          timesheetEntries.map((entry, index) => (
             <TimesheetEntryCard
-              key={entry.id}
-              id={entry.id}
+              key={`${entry.date}-${entry.startTime}-${index}`}
               date={entry.date}
-              timeStarted={entry.timeStarted}
-              timeFinished={entry.timeFinished}
+              startTime={entry.startTime}
+              endTime={entry.endTime}
               duration={entry.duration}
               onDelete={handleDeleteTimesheet}
               onEdit={handleEditTimesheet}

@@ -125,7 +125,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
 
   const handleTagsUpdate = (tags: Tag[]) => {
     if (editData) {
-      setEditData({ ...editData, selectedTags: tags })
+      setEditData({ ...editData, tags })
     }
   }
 

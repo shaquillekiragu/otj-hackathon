@@ -39,9 +39,9 @@ const JournalListCard = ({
               <span
                 key={tag.id}
                 className="px-3 py-1 rounded text-white text-sm font-medium"
-                style={{ backgroundColor: tag.hexColor }}
+                style={{ backgroundColor: tag.tagColour }}
               >
-                {tag.name}
+                {tag.tagDescription}
               </span>
             ))}
           </div>

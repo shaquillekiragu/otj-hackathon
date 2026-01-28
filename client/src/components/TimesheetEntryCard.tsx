@@ -4,57 +4,45 @@ import { faTrashCan } from '@fortawesome/free-regular-svg-icons/faTrashCan'
 import { faPencil } from '@fortawesome/free-solid-svg-icons/faPencil'
 import {
   calculateDuration,
-  parseDateForInput,
-  formatDateForDisplay
+  formatDuration,
+  formatDate,
+  formatTime
 } from '../utils/timeCalculations'
+import type { TimesheetEntry } from '../types/timesheet'
 
-interface TimesheetEntryCardProps {
-  id: string
-  date: string
-  timeStarted: string
-  timeFinished: string
-  duration: string
-  onDelete: (id: string) => void
-  onEdit: (
-    id: string,
-    updatedEntry: {
-      date: string
-      timeStarted: string
-      timeFinished: string
-      duration: string
-    }
-  ) => void
+interface TimesheetEntryCardProps extends TimesheetEntry {
+  onDelete: (entry: TimesheetEntry) => void
+  onEdit: (updatedEntry: TimesheetEntry) => void
 }
 
 const TimesheetEntryCard = ({
-  id,
   date,
-  timeStarted,
-  timeFinished,
+  startTime,
+  endTime,
   duration,
   onDelete,
   onEdit
 }: TimesheetEntryCardProps) => {
   const [isEditing, setIsEditing] = useState(false)
-  const [editedDate, setEditedDate] = useState(parseDateForInput(date))
-  const [editedTimeStarted, setEditedTimeStarted] = useState(timeStarted)
-  const [editedTimeFinished, setEditedTimeFinished] = useState(timeFinished)
+  const [editedDate, setEditedDate] = useState(date)
+  const [editedStartTime, setEditedStartTime] = useState(startTime)
+  const [editedEndTime, setEditedEndTime] = useState(endTime)
 
   const handleSave = () => {
-    const newDuration = calculateDuration(editedTimeStarted, editedTimeFinished)
-    onEdit(id, {
-      date: formatDateForDisplay(editedDate),
-      timeStarted: editedTimeStarted,
-      timeFinished: editedTimeFinished,
+    const newDuration = calculateDuration(editedStartTime, editedEndTime)
+    onEdit({
+      date: editedDate,
+      startTime: editedStartTime,
+      endTime: editedEndTime,
       duration: newDuration
     })
     setIsEditing(false)
   }
 
   const handleCancel = () => {
-    setEditedDate(parseDateForInput(date))
-    setEditedTimeStarted(timeStarted)
-    setEditedTimeFinished(timeFinished)
+    setEditedDate(date)
+    setEditedStartTime(startTime)
+    setEditedEndTime(endTime)
     setIsEditing(false)
   }
 
@@ -77,8 +65,8 @@ const TimesheetEntryCard = ({
             </label>
             <input
               type="time"
-              value={editedTimeStarted}
-              onChange={(e) => setEditedTimeStarted(e.target.value)}
+              value={editedStartTime}
+              onChange={(e) => setEditedStartTime(e.target.value)}
               className="text-sm px-2 py-1 border border-gray-300 rounded"
             />
           </div>
@@ -88,8 +76,8 @@ const TimesheetEntryCard = ({
             </label>
             <input
               type="time"
-              value={editedTimeFinished}
-              onChange={(e) => setEditedTimeFinished(e.target.value)}
+              value={editedEndTime}
+              onChange={(e) => setEditedEndTime(e.target.value)}
               className="text-sm px-2 py-1 border border-gray-300 rounded"
             />
           </div>
@@ -98,7 +86,9 @@ const TimesheetEntryCard = ({
               Duration:
             </label>
             <div className="text-sm px-2 py-1 font-semibold">
-              {calculateDuration(editedTimeStarted, editedTimeFinished) || '-'}
+              {formatDuration(
+                calculateDuration(editedStartTime, editedEndTime)
+              ) || '-'}
             </div>
           </div>
           <div className="flex gap-2 items-end">
@@ -125,19 +115,21 @@ const TimesheetEntryCard = ({
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-1">
           <span className="text-xs text-gray-500 font-medium">Date:</span>
-          <span className="text-sm">{date}</span>
+          <span className="text-sm">{formatDate(date)}</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="text-xs text-gray-500 font-medium">Started:</span>
-          <span className="text-sm">{timeStarted}</span>
+          <span className="text-sm">{formatTime(startTime)}</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="text-xs text-gray-500 font-medium">Finished:</span>
-          <span className="text-sm">{timeFinished}</span>
+          <span className="text-sm">{formatTime(endTime)}</span>
         </div>
         <div className="flex items-center gap-1 ml-auto">
           <span className="text-xs text-gray-500 font-medium">Duration:</span>
-          <span className="text-sm font-semibold">{duration}</span>
+          <span className="text-sm font-semibold">
+            {formatDuration(duration)}
+          </span>
         </div>
         <div className="flex gap-2 items-center ml-2">
           <button
@@ -148,7 +140,7 @@ const TimesheetEntryCard = ({
             <FontAwesomeIcon icon={faPencil} className="text-sm" />
           </button>
           <button
-            onClick={() => onDelete(id)}
+            onClick={() => onDelete({ date, startTime, endTime, duration })}
             className="p-1.5 text-red-600 hover:bg-red-100 rounded transition-colors"
             title="Delete entry"
           >

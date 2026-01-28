@@ -1,5 +1,5 @@
-export const calculateDuration = (start: string, end: string): string => {
-  if (!start || !end) return ''
+export const calculateDuration = (start: string, end: string): number => {
+  if (!start || !end) return 0
 
   const [startHour, startMin] = start.split(':').map(Number)
   const [endHour, endMin] = end.split(':').map(Number)
@@ -10,12 +10,49 @@ export const calculateDuration = (start: string, end: string): string => {
   let diffMin = endTotalMin - startTotalMin
   if (diffMin < 0) diffMin += 24 * 60 // Handle overnight
 
-  const hours = Math.floor(diffMin / 60)
-  const minutes = diffMin % 60
+  return diffMin
+}
 
-  if (hours === 0) return `${minutes}m`
-  if (minutes === 0) return `${hours}h`
-  return `${hours}h ${minutes}m`
+export const formatDuration = (minutes: number): string => {
+  if (minutes === 0) return '0m'
+
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+
+  if (hours === 0) return `${mins}m`
+  if (mins === 0) return `${hours}h`
+  return `${hours}h ${mins}m`
+}
+
+export const formatDate = (isoDate: string): string => {
+  if (!isoDate) return ''
+  const date = new Date(isoDate)
+  if (isNaN(date.getTime())) return ''
+
+  const day = date.getDate()
+  const month = date.toLocaleString('en-GB', { month: 'long' })
+  const year = date.getFullYear()
+
+  // Add ordinal suffix
+  const getOrdinal = (n: number) => {
+    const s = ['th', 'st', 'nd', 'rd']
+    const v = n % 100
+    return n + (s[(v - 20) % 10] || s[v] || s[0])
+  }
+
+  return `${getOrdinal(day)} ${month} ${year}`
+}
+
+export const formatTime = (isoTime: string): string => {
+  if (!isoTime) return ''
+  const date = new Date(isoTime)
+  if (isNaN(date.getTime())) return ''
+
+  return date.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
 }
 
 export const formatDateForDisplay = (isoDate: string): string => {
