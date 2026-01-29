@@ -1,50 +1,52 @@
-import { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrashCan } from '@fortawesome/free-regular-svg-icons/faTrashCan'
-import { faPencil } from '@fortawesome/free-solid-svg-icons/faPencil'
+import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashCan } from '@fortawesome/free-regular-svg-icons/faTrashCan';
+import { faPencil } from '@fortawesome/free-solid-svg-icons/faPencil';
 import {
   calculateDuration,
   formatDuration,
   formatDate,
-  formatTime
-} from '../utils/timeCalculations'
-import type { TimesheetEntry } from '../types/timesheet'
+  formatTime,
+} from '../utils/timeCalculations';
+import type { TimesheetEntry } from '../types/timesheet';
 
 interface TimesheetEntryCardProps extends TimesheetEntry {
-  onDelete: (entry: TimesheetEntry) => void
-  onEdit: (updatedEntry: TimesheetEntry) => void
+  onDelete: (entry: TimesheetEntry) => void;
+  onEdit: (updatedEntry: TimesheetEntry) => void;
 }
 
 const TimesheetEntryCard = ({
+  id,
   date,
   startTime,
   endTime,
   duration,
   onDelete,
-  onEdit
+  onEdit,
 }: TimesheetEntryCardProps) => {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedDate, setEditedDate] = useState(date)
-  const [editedStartTime, setEditedStartTime] = useState(startTime)
-  const [editedEndTime, setEditedEndTime] = useState(endTime)
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedDate, setEditedDate] = useState(date);
+  const [editedStartTime, setEditedStartTime] = useState(startTime);
+  const [editedEndTime, setEditedEndTime] = useState(endTime);
 
   const handleSave = () => {
-    const newDuration = calculateDuration(editedStartTime, editedEndTime)
+    const newDuration = calculateDuration(editedStartTime, editedEndTime);
     onEdit({
+      id,
       date: editedDate,
       startTime: editedStartTime,
       endTime: editedEndTime,
-      duration: newDuration
-    })
-    setIsEditing(false)
-  }
+      duration: newDuration,
+    });
+    setIsEditing(false);
+  };
 
   const handleCancel = () => {
-    setEditedDate(date)
-    setEditedStartTime(startTime)
-    setEditedEndTime(endTime)
-    setIsEditing(false)
-  }
+    setEditedDate(date);
+    setEditedStartTime(startTime);
+    setEditedEndTime(endTime);
+    setIsEditing(false);
+  };
 
   if (isEditing) {
     return (
@@ -87,7 +89,7 @@ const TimesheetEntryCard = ({
             </label>
             <div className="text-sm px-2 py-1 font-semibold">
               {formatDuration(
-                calculateDuration(editedStartTime, editedEndTime)
+                calculateDuration(editedStartTime, editedEndTime),
               ) || '-'}
             </div>
           </div>
@@ -107,7 +109,7 @@ const TimesheetEntryCard = ({
           </div>
         </div>
       </article>
-    )
+    );
   }
 
   return (
@@ -140,7 +142,7 @@ const TimesheetEntryCard = ({
             <FontAwesomeIcon icon={faPencil} className="text-sm" />
           </button>
           <button
-            onClick={() => onDelete({ date, startTime, endTime, duration })}
+            onClick={() => onDelete({ id, date, startTime, endTime, duration })}
             className="p-1.5 text-red-600 hover:bg-red-100 rounded transition-colors"
             title="Delete entry"
           >
@@ -149,7 +151,7 @@ const TimesheetEntryCard = ({
         </div>
       </div>
     </article>
-  )
-}
+  );
+};
 
-export default TimesheetEntryCard
+export default TimesheetEntryCard;

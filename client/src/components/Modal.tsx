@@ -1,25 +1,30 @@
-import { useEffect, useState } from 'react'
-import ReadEntryView from './ReadEntryView'
-import EditEntryView from './EditEntryView'
-import { type JournalEntry } from '../utils/journalData'
-import { type Tag } from '../types/journal'
-import { type TimesheetEntry } from '../types/timesheet'
-import { useJournalEntry } from '../hooks/useJournalEntry'
-import { useCreateJournalEntry } from '../hooks/useCreateJournalEntry'
+import { useEffect, useState } from 'react';
+import ReadEntryView from './ReadEntryView';
+import EditEntryView from './EditEntryView';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import { type JournalEntry } from '../utils/journalData';
+import { type Tag } from '../types/journal';
+import { type TimesheetEntry } from '../types/timesheet';
+import { useJournalEntry } from '../hooks/useJournalEntry';
+import { useCreateJournalEntry } from '../hooks/useCreateJournalEntry';
+import { useDeleteJournalEntry } from '../hooks/useDeleteJournalEntry';
+import { useUpdateJournalEntry } from '../hooks/useUpdateJournalEntry';
 
-const USER_ID = '64eea3f8b1234567890abcde'
+const USER_ID = '64eea3f8b1234567890abcde';
 
-type ModalView = 'readEntry' | 'edit' | 'create'
+type ModalView = 'readEntry' | 'edit' | 'create';
 
 interface ModalProps {
-  onClose: () => void
-  entryId: string
+  onClose: () => void;
+  entryId: string;
+  onDelete?: () => void;
+  onUpdate?: () => void;
 }
 
 interface ButtonConfig {
-  label: string
-  onClick: () => void
-  variant: 'primary' | 'success' | 'danger' | 'secondary'
+  label: string;
+  onClick: () => void;
+  variant: 'primary' | 'success' | 'danger' | 'secondary';
 }
 
 const buttonStyles = {
@@ -27,12 +32,12 @@ const buttonStyles = {
   primary: '!bg-blue-500 hover:!bg-blue-600',
   success: '!bg-green-500 hover:!bg-green-600',
   danger: '!bg-red-500 hover:!bg-red-600',
-  secondary: '!bg-gray-400 !text-gray-800 hover:!bg-gray-500'
-}
+  secondary: '!bg-gray-400 !text-gray-800 hover:!bg-gray-500',
+};
 
-const Modal = ({ onClose, entryId }: ModalProps) => {
-  const initialView = entryId ? 'readEntry' : 'create'
-  const [view, setView] = useState<ModalView>(initialView)
+const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
+  const initialView = entryId ? 'readEntry' : 'create';
+  const [view, setView] = useState<ModalView>(initialView);
   const {
     entry: entryData,
     timesheets,
@@ -41,24 +46,27 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
     refetch,
     fetchTimesheets,
     totalPages,
-    currentPage
-  } = useJournalEntry(entryId)
-  const { createJournalEntry } = useCreateJournalEntry()
-  const [editData, setEditData] = useState<JournalEntry | null>(null)
+    currentPage,
+  } = useJournalEntry(entryId);
+  const { createJournalEntry } = useCreateJournalEntry();
+  const { deleteJournalEntry, loading: isDeleting } = useDeleteJournalEntry();
+  const { updateJournalEntry, loading: isUpdating } = useUpdateJournalEntry();
+  const [editData, setEditData] = useState<JournalEntry | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [])
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleSave = async () => {
     if (view === 'create') {
       // Create new journal entry
       if (!editData) {
-        console.error('No data to save')
-        return
+        console.error('No data to save');
+        return;
       }
 
       const createdEntry = await createJournalEntry({
@@ -68,37 +76,95 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         description: {
           intend: editData.description?.intend || '',
           implementation: editData.description?.implementation || '',
-          impact: editData.description?.impact || ''
+          impact: editData.description?.impact || '',
         },
         tags: editData.tags || [],
-        timeSheets: editData.timeSheets || []
-      })
+        timeSheets: editData.timeSheets || [],
+      });
 
       if (createdEntry) {
         // Update editData with the created entry
-        setEditData(createdEntry)
+        setEditData(createdEntry);
         // Switch to read view to show the newly created entry
-        setView('readEntry')
+        setView('readEntry');
       }
     } else if (entryId && view === 'edit') {
       // Update existing entry
-      // TODO: Implement update logic
-      console.log('Update entry', editData)
+      if (!editData) {
+        console.error('No data to update');
+        return;
+      }
 
-      await refetch()
-      setEditData(null)
-      setView('readEntry')
+      const updatedEntry = await updateJournalEntry(entryId, {
+        userId: USER_ID,
+        title: editData.title || '',
+        category: editData.category || '',
+        description: {
+          intend: editData.description?.intend || '',
+          implementation: editData.description?.implementation || '',
+          impact: editData.description?.impact || '',
+        },
+        tags: editData.tags || [],
+        timeSheets: editData.timeSheets || [],
+      });
+
+      if (updatedEntry) {
+        await refetch();
+        onUpdate?.();
+        setView('readEntry');
+      }
     }
-  }
+  };
 
   const handleDiscard = () => {
-    onClose()
-  }
+    onClose();
+  };
 
-  const handleDelete = () => {
-    // TODO: Implement delete logic
-    console.log('Delete entry')
-  }
+  const handleDeleteClick = () => {
+    if (!entryId && !editData?.id) {
+      console.error('No entry to delete');
+      return;
+    }
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const idToDelete = entryId || editData?.id || '';
+    const success = await deleteJournalEntry(idToDelete);
+
+    if (success) {
+      setShowDeleteConfirmation(false);
+      onDelete?.();
+      onClose();
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+  };
+
+  const handleTimesheetUpdate = async (updatedTimesheets: TimesheetEntry[]) => {
+    if (!entryId || !entryData) {
+      console.error('No entry to update');
+      return;
+    }
+
+    await updateJournalEntry(entryId, {
+      userId: USER_ID,
+      title: entryData.title || '',
+      category: entryData.category || '',
+      description: {
+        intend: entryData.description?.intend || '',
+        implementation: entryData.description?.implementation || '',
+        impact: entryData.description?.impact || '',
+      },
+      tags: entryData.tags || [],
+      timeSheets: updatedTimesheets,
+    });
+
+    await refetch();
+    onUpdate?.();
+  };
 
   const getFooterButtons = (): ButtonConfig[] => {
     if (view === 'create') {
@@ -106,48 +172,51 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         {
           label: 'Save',
           onClick: handleSave,
-          variant: 'success'
+          variant: 'success',
         },
         {
           label: 'Discard',
           onClick: handleDiscard,
-          variant: 'secondary'
-        }
-      ]
+          variant: 'secondary',
+        },
+      ];
     }
     if (view === 'edit') {
       return [
         {
           label: 'Save',
           onClick: handleSave,
-          variant: 'success'
+          variant: 'success',
         },
         {
           label: 'Cancel',
           onClick: () => setView('readEntry'),
-          variant: 'primary'
+          variant: 'primary',
         },
-        { label: 'Delete', onClick: handleDelete, variant: 'danger' }
-      ]
+        { label: 'Delete', onClick: handleDeleteClick, variant: 'danger' },
+      ];
     }
     return [
       {
         label: 'Edit',
         onClick: () => {
           if (entryData) {
-            setEditData(entryData)
+            setEditData({
+              ...entryData,
+              timeSheets: timesheets || entryData.timeSheets || [],
+            });
           }
-          setView('edit')
+          setView('edit');
         },
-        variant: 'secondary'
+        variant: 'secondary',
       },
-      { label: 'Close', onClick: onClose, variant: 'secondary' }
-    ]
-  }
+      { label: 'Close', onClick: onClose, variant: 'secondary' },
+    ];
+  };
 
   const handleEntryUpdate = (updates: Partial<JournalEntry>) => {
     if (editData) {
-      setEditData({ ...editData, ...updates })
+      setEditData({ ...editData, ...updates });
     } else {
       // Initialize editData for create mode
       setEditData({
@@ -157,20 +226,20 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         description: {
           intend: '',
           implementation: '',
-          impact: ''
+          impact: '',
         },
         tags: [],
         timeSheets: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        ...updates
-      } as JournalEntry)
+        ...updates,
+      } as JournalEntry);
     }
-  }
+  };
 
   const handleTagsUpdate = (tags: Tag[]) => {
     if (editData) {
-      setEditData({ ...editData, tags })
+      setEditData({ ...editData, tags });
     } else {
       // Initialize editData for create mode with tags
       setEditData({
@@ -180,19 +249,19 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         description: {
           intend: '',
           implementation: '',
-          impact: ''
+          impact: '',
         },
         tags,
         timeSheets: [],
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as JournalEntry)
+        updatedAt: new Date().toISOString(),
+      } as JournalEntry);
     }
-  }
+  };
 
   const handleTimesheetsUpdate = (timeSheets: TimesheetEntry[]) => {
     if (editData) {
-      setEditData({ ...editData, timeSheets })
+      setEditData({ ...editData, timeSheets });
     } else {
       // Initialize editData for create mode with timesheets
       setEditData({
@@ -202,15 +271,15 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         description: {
           intend: '',
           implementation: '',
-          impact: ''
+          impact: '',
         },
         tags: [],
         timeSheets,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as JournalEntry)
+        updatedAt: new Date().toISOString(),
+      } as JournalEntry);
     }
-  }
+  };
 
   const renderView = () => {
     if (isLoading) {
@@ -218,7 +287,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         <div className="flex items-center justify-center h-64">
           <p className="text-gray-500">Loading...</p>
         </div>
-      )
+      );
     }
 
     if (error) {
@@ -226,7 +295,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         <div className="flex items-center justify-center h-64">
           <p className="text-red-500">Error: {error}</p>
         </div>
-      )
+      );
     }
 
     if (entryId && !entryData && view !== 'create') {
@@ -234,13 +303,13 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
         <div className="flex items-center justify-center h-64">
           <p className="text-gray-500">Entry not found</p>
         </div>
-      )
+      );
     }
 
     switch (view) {
       case 'readEntry': {
         // Use editData if available (after creating), otherwise use entryData
-        const dataToShow = editData || entryData
+        const dataToShow = editData || entryData;
         return dataToShow ? (
           <ReadEntryView
             entryData={dataToShow}
@@ -248,8 +317,9 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
             fetchTimesheets={fetchTimesheets}
             totalPages={totalPages}
             currentPage={currentPage}
+            onTimesheetUpdate={handleTimesheetUpdate}
           />
-        ) : null
+        ) : null;
       }
       case 'edit':
         return editData ? (
@@ -263,7 +333,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
             totalPages={totalPages}
             currentPage={currentPage}
           />
-        ) : null
+        ) : null;
       case 'create':
         return (
           <EditEntryView
@@ -272,11 +342,11 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
             onTagsUpdate={handleTagsUpdate}
             onTimesheetsUpdate={handleTimesheetsUpdate}
             timesheetEntries={editData?.timeSheets || []}
-            fetchTimesheets={async () => { }}
+            fetchTimesheets={async () => {}}
             totalPages={1}
             currentPage={1}
           />
-        )
+        );
       default:
         return entryData ? (
           <ReadEntryView
@@ -285,10 +355,11 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
             fetchTimesheets={fetchTimesheets}
             totalPages={totalPages}
             currentPage={currentPage}
+            onTimesheetUpdate={handleTimesheetUpdate}
           />
-        ) : null
+        ) : null;
     }
-  }
+  };
 
   return (
     <section
@@ -296,25 +367,49 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg w-3/4 max-h-[90vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        onClick={onClose}
       >
-        <div className="p-8 overflow-y-auto flex-1">{renderView()}</div>
+        <div
+          className="bg-white rounded-lg w-3/4 max-h-[90vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="p-8 overflow-y-auto flex-1">{renderView()}</div>
 
-        <div className="flex justify-end gap-2 p-4 border-t border-gray-200 bg-white rounded-b-lg">
-          {getFooterButtons().map((btn) => (
-            <button
-              key={btn.label}
-              onClick={btn.onClick}
-              className={`${buttonStyles.base} ${buttonStyles[btn.variant]}`}
-            >
-              {btn.label}
-            </button>
-          ))}
+          <div className="flex justify-end gap-2 p-4 border-t border-gray-200 bg-white rounded-b-lg">
+            {getFooterButtons().map((btn) => (
+              <button
+                key={btn.label}
+                onClick={btn.onClick}
+                disabled={
+                  (isDeleting && btn.label === 'Delete') ||
+                  (isUpdating && btn.label === 'Save')
+                }
+                className={`${buttonStyles.base} ${buttonStyles[btn.variant]} ${
+                  (isDeleting && btn.label === 'Delete') ||
+                  (isUpdating && btn.label === 'Save')
+                    ? '!opacity-50 !cursor-not-allowed'
+                    : ''
+                }`}
+              >
+                {isDeleting && btn.label === 'Delete'
+                  ? 'Deleting...'
+                  : isUpdating && btn.label === 'Save'
+                    ? 'Saving...'
+                    : btn.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+      <DeleteConfirmationModal
+        isOpen={showDeleteConfirmation}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isDeleting={isDeleting}
+      />
     </section>
-  )
-}
+  );
+};
 
-export default Modal
+export default Modal;

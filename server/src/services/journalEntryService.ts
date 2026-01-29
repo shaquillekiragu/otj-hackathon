@@ -34,12 +34,18 @@ export const createJournalEntryService = async (createInput: JournalInput) => {
     await syncUserTags(userObjectId, normalisedTags);
   }
 
+  // Ensure each timesheet has a unique _id
+  const timeSheetsWithIds = timeSheets.map((ts) => ({
+    ...ts,
+    _id: ts._id || new ObjectId(),
+  }));
+
   const newJournalEntry: JournalEntryDocument = {
     userId: new ObjectId(userId),
     title,
     category,
     description,
-    timeSheets,
+    timeSheets: timeSheetsWithIds,
     tags: normalisedTags,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -157,7 +163,12 @@ export const updateJournalEntryService = async (
   };
 
   if (typeof timeSheets !== 'undefined') {
-    updatedFields.timeSheets = timeSheets;
+    // Ensure each timesheet has a unique _id
+    const timeSheetsWithIds = timeSheets.map((ts) => ({
+      ...ts,
+      _id: ts._id || new ObjectId(),
+    }));
+    updatedFields.timeSheets = timeSheetsWithIds;
   }
 
   if (typeof tags !== 'undefined') {

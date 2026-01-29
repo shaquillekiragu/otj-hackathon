@@ -1,21 +1,21 @@
-import TimesheetEntryCard from './TimesheetEntryCard'
-import TimesheetCreationCard from './TimesheetCreationCard'
-import type { TimesheetEntry, NewTimesheetEntry } from '../types/timesheet'
+import TimesheetEntryCard from './TimesheetEntryCard';
+import TimesheetCreationCard from './TimesheetCreationCard';
+import type { TimesheetEntry, NewTimesheetEntry } from '../types/timesheet';
 
 interface TimesheetSectionProps {
-  currentPage: number
-  totalPages: number
-  isAddingTimesheet: boolean
-  newEntry: NewTimesheetEntry
-  timesheetEntries: TimesheetEntry[]
-  setIsAddingTimesheet: (value: boolean) => void
-  setNewEntry: (entry: NewTimesheetEntry) => void
-  handleSaveTimesheet: () => void
-  handleDeleteTimesheet: (entry: TimesheetEntry) => void
-  handleEditTimesheet: (updatedEntry: TimesheetEntry) => void
-  closeTimesheetForm: () => void
-  goToPreviousPage: () => void
-  goToNextPage: () => void
+  currentPage: number;
+  totalPages: number;
+  isAddingTimesheet: boolean;
+  newEntry: NewTimesheetEntry;
+  timesheetEntries: TimesheetEntry[];
+  setIsAddingTimesheet: (value: boolean) => void;
+  setNewEntry: (entry: NewTimesheetEntry) => void;
+  handleSaveTimesheet: () => void;
+  handleDeleteTimesheet: (entry: TimesheetEntry) => void;
+  handleEditTimesheet: (updatedEntry: TimesheetEntry) => void;
+  closeTimesheetForm: () => void;
+  goToPreviousPage: () => void;
+  goToNextPage: () => void;
 }
 
 const TimesheetSection = ({
@@ -31,10 +31,10 @@ const TimesheetSection = ({
   handleEditTimesheet,
   closeTimesheetForm,
   goToPreviousPage,
-  goToNextPage
+  goToNextPage,
 }: TimesheetSectionProps) => {
   const paginationButtonClass =
-    'px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
+    'px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed';
 
   return (
     <section className="mb-6">
@@ -74,7 +74,8 @@ const TimesheetSection = ({
         ) : (
           timesheetEntries.map((entry, index) => (
             <TimesheetEntryCard
-              key={`${entry.date}-${entry.startTime}-${index}`}
+              key={entry.id || `${entry.date}-${entry.startTime}-${index}`}
+              id={entry.id}
               date={entry.date}
               startTime={entry.startTime}
               endTime={entry.endTime}
@@ -107,7 +108,7 @@ const TimesheetSection = ({
         </div>
       )}
     </section>
-  )
-}
+  );
+};
 
-export default TimesheetSection
+export default TimesheetSection;
