@@ -22,17 +22,17 @@ export default function HeaderSection({
       <div className="mb-6">
         <div className="mb-6">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 mb-3 tracking-tight leading-tight">
-            Log Off-the-Job Activities
+            Off-the-Job Training Log
           </h1>
           <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 sm:p-8 border border-blue-100 shadow-sm mb-4">
           <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
-            Off-the-Job (OTJ) training refers to learning activities that take
-            place during your paid working hours, but that are not part of your
-            day-to-day duties. You can see more information on what counts as
-            OTJ training{' '}
+            Off-the-job (OTJ) training includes learning activities completed
+            during your paid working hours that are outside your normal
+            day-to-day duties. You can find more information about what counts
+            as OTJ training{' '}
             <a
               href={otjRequirements}
               target="_blank"

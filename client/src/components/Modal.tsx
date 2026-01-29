@@ -28,11 +28,13 @@ interface ButtonConfig {
 }
 
 const buttonStyles = {
-  base: '!px-4 !py-2 !text-white !rounded',
-  primary: '!bg-blue-500 hover:!bg-blue-600',
-  success: '!bg-green-500 hover:!bg-green-600',
-  danger: '!bg-red-500 hover:!bg-red-600',
-  secondary: '!bg-gray-400 !text-gray-800 hover:!bg-gray-500',
+  base: '!px-4 !py-2 !text-white !rounded-lg !font-semibold !transition-all !duration-200',
+  primary:
+    '!bg-blue-500 hover:!bg-blue-600 hover:!shadow-lg hover:!translate-y-[-2px]',
+  success:
+    '!bg-green-500 hover:!bg-green-600 hover:!shadow-lg hover:!translate-y-[-2px]',
+  danger: '!bg-red-500 hover:!bg-red-600 hover:!shadow-md',
+  secondary: '!bg-gray-300 !text-gray-800 hover:!bg-gray-400 hover:!shadow-md',
 };
 
 const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
@@ -69,6 +71,16 @@ const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
         return;
       }
 
+      // Validate that all required fields are filled
+      if (
+        !editData.description?.intend?.trim() ||
+        !editData.description?.implementation?.trim() ||
+        !editData.description?.impact?.trim()
+      ) {
+        alert('Please fill in all three description fields');
+        return;
+      }
+
       const createdEntry = await createJournalEntry({
         userId: USER_ID,
         title: editData.title || '',
@@ -94,6 +106,16 @@ const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
       // Update existing entry
       if (!editData) {
         console.error('No data to update');
+        return;
+      }
+
+      // Validate that all required fields are filled
+      if (
+        !editData.description?.intend?.trim() ||
+        !editData.description?.implementation?.trim() ||
+        !editData.description?.impact?.trim()
+      ) {
+        alert('Please fill in all three description fields');
         return;
       }
 
@@ -377,12 +399,12 @@ const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-lg w-3/4 max-h-[90vh] flex flex-col"
+          className="bg-white rounded-xl w-3/4 max-h-[90vh] flex flex-col shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-8 overflow-y-auto flex-1">{renderView()}</div>
 
-          <div className="flex justify-end gap-2 p-4 border-t border-gray-200 bg-white rounded-b-lg">
+          <div className="flex justify-end gap-3 p-6 border-t-2 border-gray-200 bg-gray-50 rounded-b-xl\">
             {getFooterButtons().map((btn) => (
               <button
                 key={btn.label}

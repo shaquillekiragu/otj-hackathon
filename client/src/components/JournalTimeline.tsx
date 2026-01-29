@@ -24,7 +24,7 @@ const JournalTimeline = ({
   onPreviousPage,
 }: JournalTimelineProps) => {
   const paginationButtonClass =
-    'px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed';
+    'px-4 py-2 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:border-blue-500 hover:text-blue-600 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:shadow-none font-medium text-sm';
 
   if (error) {
     return (
@@ -35,22 +35,39 @@ const JournalTimeline = ({
   if (loading) {
     return <div className="flex justify-center p-8">Loading entries...</div>;
   }
+
+  if (entries.length === 0) {
+    return (
+      <section className="flex items-center justify-center p-16">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-700 mb-2">
+            No journal entries found
+          </p>
+          <p className="text-sm text-gray-500">
+            Try adjusting your search or create a new journal entry to get
+            started
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="flex flex-col w-full px-8">
       {entries.map((entry, index) => {
-        // Get the most recent timesheet entry date
-        const latestDate =
+        // Get the most recent timesheet entry date for the card
+        const latestTimesheetDate =
           entry.timeSheets && entry.timeSheets.length > 0
             ? entry.timeSheets[entry.timeSheets.length - 1].date
-            : new Date().toISOString().split('T')[0];
+            : null;
 
         return (
           <div key={entry.id} className="flex gap-12 mb-4 last:mb-0">
             {/* Timeline element */}
             <div className="flex flex-col items-center">
-              {/* Circle with Date */}
+              {/* Circle with Date - shows journal entry creation date */}
               <div className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold shrink-0 text-center text-sm">
-                {formatDate(latestDate)}
+                {formatDate(entry.createdAt || entry.updatedAt)}
               </div>
               {/* Connecting line (except for last item) */}
               {index < entries.length - 1 && (
@@ -65,30 +82,36 @@ const JournalTimeline = ({
                 category={entry.category}
                 description={entry.description.intend}
                 tags={entry.tags || []}
-                lastUpdated={formatDate(entry.updatedAt)}
+                lastUpdated={
+                  latestTimesheetDate
+                    ? formatDate(latestTimesheetDate)
+                    : 'No timesheets'
+                }
               />
             </div>
           </div>
         );
       })}
       {entries.length > 0 && (
-        <div className="flex justify-center items-center gap-4 mt-6">
+        <div className="flex justify-center items-center gap-6 mt-8 pt-6 border-t border-gray-200">
           <button
             onClick={onPreviousPage}
             disabled={currentPage === 1}
             className={paginationButtonClass}
           >
-            ←
+            ← Previous
           </button>
-          <span className="text-sm text-gray-600">
-            {currentPage}/{totalPages}
-          </span>
+          <div className="px-6 py-2 bg-gray-50 rounded-lg border border-gray-200">
+            <span className="text-sm font-semibold text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+          </div>
           <button
             onClick={onNextPage}
             disabled={currentPage === totalPages}
             className={paginationButtonClass}
           >
-            →
+            Next →
           </button>
         </div>
       )}
