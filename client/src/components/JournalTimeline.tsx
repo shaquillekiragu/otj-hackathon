@@ -1,22 +1,28 @@
-import JournalListCard from './JournalListCard'
-import { useJournalEntries } from '../hooks/useJournalEntries'
-import { formatDate } from '../utils/timeCalculations'
+import JournalListCard from './JournalListCard';
+import { formatDate } from '../utils/timeCalculations';
+import type { JournalEntry } from '../utils/journalData';
 
 interface JournalTimelineProps {
-  handleClick: (id: string) => void
+  handleClick: (id: string) => void;
+  entries: JournalEntry[];
+  loading: boolean;
+  error: string | null;
 }
 
-const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
-  const { entries, loading, error } = useJournalEntries()
-
+const JournalTimeline = ({
+  handleClick,
+  entries,
+  loading,
+  error,
+}: JournalTimelineProps) => {
   if (error) {
     return (
       <div className="flex justify-center p-8 text-red-500">Error: {error}</div>
-    )
+    );
   }
 
   if (loading) {
-    return <div className="flex justify-center p-8">Loading entries...</div>
+    return <div className="flex justify-center p-8">Loading entries...</div>;
   }
   return (
     <section className="flex flex-col w-full px-8">
@@ -25,7 +31,7 @@ const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
         const latestDate =
           entry.timeSheets && entry.timeSheets.length > 0
             ? entry.timeSheets[entry.timeSheets.length - 1].date
-            : new Date().toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0];
 
         return (
           <div key={entry.id} className="flex gap-12 mb-4 last:mb-0">
@@ -52,10 +58,10 @@ const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
               />
             </div>
           </div>
-        )
+        );
       })}
     </section>
-  )
-}
+  );
+};
 
-export default JournalTimeline
+export default JournalTimeline;
