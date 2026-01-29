@@ -1,42 +1,42 @@
-import { useState } from 'react'
-import axios from 'axios'
-import type { JournalEntry } from '../utils/journalData'
-import type { Tag } from '../types/journal'
-import type { TimesheetEntry } from '../types/timesheet'
+import { useState } from 'react';
+import axios from 'axios';
+import type { JournalEntry } from '../utils/journalData';
+import type { Tag } from '../types/journal';
+import type { TimesheetEntry } from '../types/timesheet';
 
-const API_BASE_URL = 'http://localhost:8080/api'
+const API_BASE_URL = 'http://localhost:8080/api';
 
 interface CreateJournalEntryInput {
-  userId: string
-  title: string
-  category: string
+  userId: string;
+  title: string;
+  category: string;
   description: {
-    intend: string
-    implementation: string
-    impact: string
-  }
-  tags?: Tag[]
-  timeSheets?: TimesheetEntry[]
+    intend: string;
+    implementation: string;
+    impact: string;
+  };
+  tags?: Tag[];
+  timeSheets?: TimesheetEntry[];
 }
 
 interface UseCreateJournalEntryReturn {
   createJournalEntry: (
-    input: CreateJournalEntryInput
-  ) => Promise<JournalEntry | null>
-  loading: boolean
-  error: string | null
+    input: CreateJournalEntryInput,
+  ) => Promise<JournalEntry | null>;
+  loading: boolean;
+  error: string | null;
 }
 
 export const useCreateJournalEntry = (): UseCreateJournalEntryReturn => {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const createJournalEntry = async (
-    input: CreateJournalEntryInput
+    input: CreateJournalEntryInput,
   ): Promise<JournalEntry | null> => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       const payload = {
         userId: input.userId,
@@ -45,22 +45,23 @@ export const useCreateJournalEntry = (): UseCreateJournalEntryReturn => {
         description: {
           intend: input.description.intend,
           implementation: input.description.implementation,
-          impact: input.description.impact
+          impact: input.description.impact,
         },
         tags:
           input.tags?.map((tag) => ({
             tagDescription: tag.tagDescription,
-            tagColour: tag.tagColour
+            tagColour: tag.tagColour,
           })) || [],
-        timeSheets: input.timeSheets?.map((ts) => ({
-          date: new Date(ts.date),
-          startTime: new Date(`${ts.date}T${ts.startTime}`),
-          endTime: new Date(`${ts.date}T${ts.endTime}`),
-          duration: ts.duration
-        })) || []
-      }
+        timeSheets:
+          input.timeSheets?.map((ts) => ({
+            date: new Date(ts.date),
+            startTime: new Date(`${ts.date}T${ts.startTime}`),
+            endTime: new Date(`${ts.date}T${ts.endTime}`),
+            duration: ts.duration,
+          })) || [],
+      };
 
-      const response = await axios.post(`${API_BASE_URL}/journals`, payload)
+      const response = await axios.post(`${API_BASE_URL}/journals`, payload);
 
       if (response.data.success && response.data.journalEntry) {
         // Transform the response to match client format
@@ -70,36 +71,52 @@ export const useCreateJournalEntry = (): UseCreateJournalEntryReturn => {
           tags:
             response.data.journalEntry.tags?.map(
               (tag: {
-                _id: string
-                tagDescription: string
-                tagColour: string
+                _id: string;
+                tagDescription: string;
+                tagColour: string;
               }) => ({
                 ...tag,
-                id: tag._id
-              })
-            ) || []
-        }
+                id: tag._id,
+              }),
+            ) || [],
+          timeSheets:
+            response.data.journalEntry.timeSheets?.map(
+              (ts: {
+                _id: string;
+                date: string;
+                startTime: string;
+                endTime: string;
+                duration: number;
+              }) => ({
+                id: ts._id,
+                date: ts.date,
+                startTime: ts.startTime,
+                endTime: ts.endTime,
+                duration: ts.duration,
+              }),
+            ) || [],
+        };
 
-        return createdEntry
+        return createdEntry;
       }
 
-      return null
+      return null;
     } catch (err) {
-      console.error('Error creating journal entry:', err)
+      console.error('Error creating journal entry:', err);
       setError(
         axios.isAxiosError(err)
           ? err.response?.data?.message || err.message
-          : 'Failed to create journal entry'
-      )
-      return null
+          : 'Failed to create journal entry',
+      );
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return {
     createJournalEntry,
     loading,
-    error
-  }
-}
+    error,
+  };
+};
