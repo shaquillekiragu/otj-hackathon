@@ -7,6 +7,8 @@ export type UserDocument = {
   expectedOTJHours: number;
   actualOTJHours: number;
   totalOTJHours: number;
+  numberOfWeeksSinceStart?: number;
+  hoursPerWeekExpected?: number;
   lastOTJActivity: Date;
   createdAt: Date;
 };

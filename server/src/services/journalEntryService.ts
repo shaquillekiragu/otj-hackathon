@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { journalEntriesCollection } from '../db/collections';
+import { journalEntriesCollection, usersCollection } from '../db/collections';
 import {
   Description,
   JournalEntryDocument,
@@ -11,6 +11,7 @@ import { getPagination } from './utils/pagination';
 import { ApiError } from '../utils/apiError';
 import { normaliseTagsForUser } from './utils/normaliseTagsForUsers';
 import { JournalInput } from '../types/payload';
+import { calculateActualOTJHours } from './utils/calculateUserProgress';
 
 export const createJournalEntryService = async (createInput: JournalInput) => {
   const {
@@ -55,6 +56,20 @@ export const createJournalEntryService = async (createInput: JournalInput) => {
 
   if (!result.insertedId) {
     throw new ApiError('Failed to create journal entry', 500);
+  }
+
+  // Update user's actualOTJHours if timesheets were added
+  if (timeSheetsWithIds.length > 0) {
+    const actualOTJHours = await calculateActualOTJHours(userObjectId);
+    await usersCollection().updateOne(
+      { _id: userObjectId },
+      {
+        $set: {
+          actualOTJHours,
+          lastOTJActivity: new Date(),
+        },
+      },
+    );
   }
 
   return { _id: result.insertedId, ...newJournalEntry };
@@ -211,6 +226,20 @@ export const updateJournalEntryService = async (
     );
   }
 
+  // Update user's actualOTJHours if timesheets were modified
+  if (typeof timeSheets !== 'undefined') {
+    const actualOTJHours = await calculateActualOTJHours(journalEntry.userId);
+    await usersCollection().updateOne(
+      { _id: journalEntry.userId },
+      {
+        $set: {
+          actualOTJHours,
+          lastOTJActivity: new Date(),
+        },
+      },
+    );
+  }
+
   return updatedJournalEntry;
 };
 
@@ -219,9 +248,41 @@ export const deleteJournalEntryService = async (journalId: string) => {
     throw new ApiError(`Invalid journalId format: ${journalId}`, 400);
   }
 
-  const result = await journalEntriesCollection().deleteOne({
-    _id: new ObjectId(journalId),
+  const journalObjectId = new ObjectId(journalId);
+
+  // Get the journal entry before deleting to access userId
+  const journalEntry = await journalEntriesCollection().findOne({
+    _id: journalObjectId,
   });
+
+  if (!journalEntry) {
+    throw new ApiError(
+      `Journal entry not found for journal: ${journalId}`,
+      404,
+    );
+  }
+
+  const result = await journalEntriesCollection().deleteOne({
+    _id: journalObjectId,
+  });
+
+  // Update user's actualOTJHours if the entry had timesheets
+  if (
+    result.deletedCount > 0 &&
+    journalEntry.timeSheets &&
+    journalEntry.timeSheets.length > 0
+  ) {
+    const actualOTJHours = await calculateActualOTJHours(journalEntry.userId);
+    await usersCollection().updateOne(
+      { _id: journalEntry.userId },
+      {
+        $set: {
+          actualOTJHours,
+          lastOTJActivity: new Date(),
+        },
+      },
+    );
+  }
 
   return result.deletedCount;
 };
