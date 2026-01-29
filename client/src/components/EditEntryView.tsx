@@ -99,7 +99,7 @@ const EditEntryView = ({
 
   return (
     <>
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between mb-2">
         <input
           type="text"
           value={localData.title}

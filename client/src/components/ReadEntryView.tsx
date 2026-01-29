@@ -40,7 +40,7 @@ const ReadEntryView = ({
 
   return (
     <>
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between mb-2">
         <h2 className="text-2xl font-bold">{entryData.title}</h2>
         <p className="text-sm text-gray-600">
           Latest time sheet update:{' '}

@@ -36,8 +36,8 @@ const App = () => {
         />
       )}
 
-      <main className="flex flex-col items-center justify-start p-4 gap-6 my-10 overflow-x-hidden">
-        <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+      <main className="flex flex-col items-center p-4 gap-6 my-10 overflow-x-hidden">
+        <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           <HeaderSection />
 
           <div className="w-full lg:sticky lg:top-10 flex flex-col items-center lg:items-end">
