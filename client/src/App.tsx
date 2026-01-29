@@ -41,9 +41,9 @@ const App = () => {
           <HeaderSection />
 
           <div className="w-full lg:sticky lg:top-10 flex flex-col items-center lg:items-end">
-            <div className='flex flex-col items-center gap-3'>
+            <div className='flex flex-col items-center gap-4'>
               <ProgressDiagram onClick={() => setShowProgressModal(true)} />
-              <div className="flex items-center gap-1.5 text-xs text-gray-400 italic">
+              <div className="flex items-center gap-1.5 text-sm text-gray-400 italic">
                 <FontAwesomeIcon icon={faHandPointer} className="w-3 h-3" />
                 <span>Click to view details</span>
               </div>
