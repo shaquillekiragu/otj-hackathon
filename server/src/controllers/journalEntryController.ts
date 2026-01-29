@@ -38,10 +38,10 @@ export const getJournalEntry = async (req: Request, res: Response) => {
 };
 
 export const listJournalEntriesByUser = async (req: Request, res: Response) => {
+  const { page, limit, userId } = req.query;
   try {
-    const { page, limit } = req.query;
     const journalEntries = await listJournalEntriesByUserIdService(
-      req.body.userId,
+      userId as string,
       page as string,
       limit as string,
     );
@@ -50,7 +50,7 @@ export const listJournalEntriesByUser = async (req: Request, res: Response) => {
     handleError(
       res,
       error,
-      `Failed to list journal entries for user: ${req.query.userId}`,
+      `Failed to list journal entries for user: ${userId}`,
     );
   }
 };

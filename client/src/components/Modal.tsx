@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import ReadEntryView from './ReadEntryView'
 import EditEntryView from './EditEntryView'
-import { getJournalEntryById, type JournalEntry } from '../utils/journalData'
+import { type JournalEntry } from '../utils/journalData'
 import { type Tag } from '../types/journal'
+import { type TimesheetEntry } from '../types/timesheet'
+import { useJournalEntry } from '../hooks/useJournalEntry'
+import { useCreateJournalEntry } from '../hooks/useCreateJournalEntry'
+
+const USER_ID = '64eea3f8b1234567890abcde'
 
 type ModalView = 'readEntry' | 'edit' | 'create'
 
@@ -28,26 +33,18 @@ const buttonStyles = {
 const Modal = ({ onClose, entryId }: ModalProps) => {
   const initialView = entryId ? 'readEntry' : 'create'
   const [view, setView] = useState<ModalView>(initialView)
-  const [entryData, setEntryData] = useState<JournalEntry | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  // Fetch entry data if entryId exists
-  useEffect(() => {
-    const fetchEntry = async () => {
-      if (entryId) {
-        setIsLoading(true)
-        try {
-          const data = await getJournalEntryById(entryId)
-          setEntryData(data)
-        } catch (error) {
-          console.error('Failed to fetch entry:', error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-    }
-    fetchEntry()
-  }, [entryId])
+  const {
+    entry: entryData,
+    timesheets,
+    loading: isLoading,
+    error,
+    refetch,
+    fetchTimesheets,
+    totalPages,
+    currentPage
+  } = useJournalEntry(entryId)
+  const { createJournalEntry } = useCreateJournalEntry()
+  const [editData, setEditData] = useState<JournalEntry | null>(null)
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -57,21 +54,40 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
   }, [])
 
   const handleSave = async () => {
-    // TODO: Implement save logic
-    console.log('Save entry', entryData)
-
-    // If editing an existing entry, refetch the data
-    if (entryId && view === 'edit') {
-      try {
-        const data = await getJournalEntryById(entryId)
-        setEntryData(data)
-        setView('readEntry')
-      } catch (error) {
-        console.error('Failed to refetch entry:', error)
+    if (view === 'create') {
+      // Create new journal entry
+      if (!editData) {
+        console.error('No data to save')
+        return
       }
-    } else {
-      // For create mode, close the modal after save
-      onClose()
+
+      const createdEntry = await createJournalEntry({
+        userId: USER_ID,
+        title: editData.title || '',
+        category: editData.category || '',
+        description: {
+          intend: editData.description?.intend || '',
+          implementation: editData.description?.implementation || '',
+          impact: editData.description?.impact || ''
+        },
+        tags: editData.tags || [],
+        timeSheets: editData.timeSheets || []
+      })
+
+      if (createdEntry) {
+        // Update editData with the created entry
+        setEditData(createdEntry)
+        // Switch to read view to show the newly created entry
+        setView('readEntry')
+      }
+    } else if (entryId && view === 'edit') {
+      // Update existing entry
+      // TODO: Implement update logic
+      console.log('Update entry', editData)
+
+      await refetch()
+      setEditData(null)
+      setView('readEntry')
     }
   }
 
@@ -115,20 +131,84 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
       ]
     }
     return [
-      { label: 'Edit', onClick: () => setView('edit'), variant: 'secondary' },
+      {
+        label: 'Edit',
+        onClick: () => {
+          if (entryData) {
+            setEditData(entryData)
+          }
+          setView('edit')
+        },
+        variant: 'secondary'
+      },
       { label: 'Close', onClick: onClose, variant: 'secondary' }
     ]
   }
 
   const handleEntryUpdate = (updates: Partial<JournalEntry>) => {
-    if (entryData) {
-      setEntryData({ ...entryData, ...updates })
+    if (editData) {
+      setEditData({ ...editData, ...updates })
+    } else {
+      // Initialize editData for create mode
+      setEditData({
+        id: '',
+        title: '',
+        category: '',
+        description: {
+          intend: '',
+          implementation: '',
+          impact: ''
+        },
+        tags: [],
+        timeSheets: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...updates
+      } as JournalEntry)
     }
   }
 
   const handleTagsUpdate = (tags: Tag[]) => {
-    if (entryData) {
-      setEntryData({ ...entryData, selectedTags: tags })
+    if (editData) {
+      setEditData({ ...editData, tags })
+    } else {
+      // Initialize editData for create mode with tags
+      setEditData({
+        id: '',
+        title: '',
+        category: '',
+        description: {
+          intend: '',
+          implementation: '',
+          impact: ''
+        },
+        tags,
+        timeSheets: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as JournalEntry)
+    }
+  }
+
+  const handleTimesheetsUpdate = (timeSheets: TimesheetEntry[]) => {
+    if (editData) {
+      setEditData({ ...editData, timeSheets })
+    } else {
+      // Initialize editData for create mode with timesheets
+      setEditData({
+        id: '',
+        title: '',
+        category: '',
+        description: {
+          intend: '',
+          implementation: '',
+          impact: ''
+        },
+        tags: [],
+        timeSheets,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } as JournalEntry)
     }
   }
 
@@ -141,7 +221,15 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
       )
     }
 
-    if (entryId && !entryData) {
+    if (error) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+      )
+    }
+
+    if (entryId && !entryData && view !== 'create') {
       return (
         <div className="flex items-center justify-center h-64">
           <p className="text-gray-500">Entry not found</p>
@@ -150,26 +238,55 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
     }
 
     switch (view) {
-      case 'readEntry':
-        return entryData ? <ReadEntryView entryData={entryData} /> : null
+      case 'readEntry': {
+        // Use editData if available (after creating), otherwise use entryData
+        const dataToShow = editData || entryData
+        return dataToShow ? (
+          <ReadEntryView
+            entryData={dataToShow}
+            timesheetEntries={timesheets}
+            fetchTimesheets={fetchTimesheets}
+            totalPages={totalPages}
+            currentPage={currentPage}
+          />
+        ) : null
+      }
       case 'edit':
-        return entryData ? (
+        return editData ? (
           <EditEntryView
-            entryData={entryData}
+            entryData={editData}
             onUpdate={handleEntryUpdate}
             onTagsUpdate={handleTagsUpdate}
+            onTimesheetsUpdate={handleTimesheetsUpdate}
+            timesheetEntries={timesheets}
+            fetchTimesheets={fetchTimesheets}
+            totalPages={totalPages}
+            currentPage={currentPage}
           />
         ) : null
       case 'create':
         return (
           <EditEntryView
-            entryData={null}
+            entryData={editData}
             onUpdate={handleEntryUpdate}
             onTagsUpdate={handleTagsUpdate}
+            onTimesheetsUpdate={handleTimesheetsUpdate}
+            timesheetEntries={editData?.timeSheets || []}
+            fetchTimesheets={async () => {}}
+            totalPages={1}
+            currentPage={1}
           />
         )
       default:
-        return entryData ? <ReadEntryView entryData={entryData} /> : null
+        return entryData ? (
+          <ReadEntryView
+            entryData={entryData}
+            timesheetEntries={timesheets}
+            fetchTimesheets={fetchTimesheets}
+            totalPages={totalPages}
+            currentPage={currentPage}
+          />
+        ) : null
     }
   }
 

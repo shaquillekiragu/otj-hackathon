@@ -4,17 +4,15 @@ import type { TimesheetEntry, NewTimesheetEntry } from '../types/timesheet'
 
 interface TimesheetSectionProps {
   currentPage: number
+  totalPages: number
   isAddingTimesheet: boolean
   newEntry: NewTimesheetEntry
-  timesheetEntries: TimesheetEntry[][]
+  timesheetEntries: TimesheetEntry[]
   setIsAddingTimesheet: (value: boolean) => void
   setNewEntry: (entry: NewTimesheetEntry) => void
   handleSaveTimesheet: () => void
-  handleDeleteTimesheet: (id: string) => void
-  handleEditTimesheet: (
-    id: string,
-    updatedEntry: Omit<TimesheetEntry, 'id'>
-  ) => void
+  handleDeleteTimesheet: (entry: TimesheetEntry) => void
+  handleEditTimesheet: (updatedEntry: TimesheetEntry) => void
   closeTimesheetForm: () => void
   goToPreviousPage: () => void
   goToNextPage: () => void
@@ -22,6 +20,7 @@ interface TimesheetSectionProps {
 
 const TimesheetSection = ({
   currentPage,
+  totalPages,
   isAddingTimesheet,
   newEntry,
   timesheetEntries,
@@ -54,15 +53,13 @@ const TimesheetSection = ({
         {isAddingTimesheet && (
           <TimesheetCreationCard
             date={newEntry.date}
-            timeStarted={newEntry.timeStarted}
-            timeFinished={newEntry.timeFinished}
+            startTime={newEntry.startTime}
+            endTime={newEntry.endTime}
             onDateChange={(date) => setNewEntry({ ...newEntry, date })}
-            onTimeStartedChange={(timeStarted) =>
-              setNewEntry({ ...newEntry, timeStarted })
+            onStartTimeChange={(startTime) =>
+              setNewEntry({ ...newEntry, startTime })
             }
-            onTimeFinishedChange={(timeFinished) =>
-              setNewEntry({ ...newEntry, timeFinished })
-            }
+            onEndTimeChange={(endTime) => setNewEntry({ ...newEntry, endTime })}
             onSave={handleSaveTimesheet}
             onCancel={closeTimesheetForm}
           />
@@ -75,13 +72,12 @@ const TimesheetSection = ({
             </p>
           </div>
         ) : (
-          timesheetEntries[currentPage]?.map((entry) => (
+          timesheetEntries.map((entry, index) => (
             <TimesheetEntryCard
-              key={entry.id}
-              id={entry.id}
+              key={`${entry.date}-${entry.startTime}-${index}`}
               date={entry.date}
-              timeStarted={entry.timeStarted}
-              timeFinished={entry.timeFinished}
+              startTime={entry.startTime}
+              endTime={entry.endTime}
               duration={entry.duration}
               onDelete={handleDeleteTimesheet}
               onEdit={handleEditTimesheet}
@@ -93,17 +89,17 @@ const TimesheetSection = ({
         <div className="flex justify-center items-center gap-4 mt-3">
           <button
             onClick={goToPreviousPage}
-            disabled={currentPage === 0}
+            disabled={currentPage === 1}
             className={paginationButtonClass}
           >
             ←
           </button>
           <span className="text-sm text-gray-600">
-            {currentPage + 1}/{timesheetEntries.length}
+            {currentPage}/{totalPages}
           </span>
           <button
             onClick={goToNextPage}
-            disabled={currentPage === timesheetEntries.length - 1}
+            disabled={currentPage === totalPages}
             className={paginationButtonClass}
           >
             →

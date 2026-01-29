@@ -1,13 +1,12 @@
 export interface TimesheetEntry {
-  id: string
   date: string
-  timeStarted: string
-  timeFinished: string
-  duration: string
+  startTime: string
+  endTime: string
+  duration: number
 }
 
 export interface NewTimesheetEntry {
   date: string
-  timeStarted: string
-  timeFinished: string
+  startTime: string
+  endTime: string
 }

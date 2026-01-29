@@ -1,19 +1,19 @@
 export interface Tag {
   id: string
-  name: string
-  hexColor: string
+  tagDescription: string
+  tagColour: string
 }
 
 // Placeholder tag data (will come from API)
 export const PLACEHOLDER_TAGS: Tag[] = [
-  { id: '1', name: 'Learning', hexColor: '#3B82F6' },
-  { id: '2', name: 'Development', hexColor: '#10B981' },
-  { id: '3', name: 'Research', hexColor: '#8B5CF6' },
-  { id: '4', name: 'Mentoring', hexColor: '#F59E0B' },
-  { id: '5', name: 'Documentation', hexColor: '#EF4444' },
-  { id: '6', name: 'Testing', hexColor: '#EC4899' },
-  { id: '7', name: 'Meeting', hexColor: '#14B8A6' },
-  { id: '8', name: 'Review', hexColor: '#6366F1' }
+  { id: '1', tagDescription: 'Learning', tagColour: '#3B82F6' },
+  { id: '2', tagDescription: 'Development', tagColour: '#10B981' },
+  { id: '3', tagDescription: 'Research', tagColour: '#8B5CF6' },
+  { id: '4', tagDescription: 'Mentoring', tagColour: '#F59E0B' },
+  { id: '5', tagDescription: 'Documentation', tagColour: '#EF4444' },
+  { id: '6', tagDescription: 'Testing', tagColour: '#EC4899' },
+  { id: '7', tagDescription: 'Meeting', tagColour: '#14B8A6' },
+  { id: '8', tagDescription: 'Review', tagColour: '#6366F1' }
 ]
 
 export const PLACEHOLDER_ENTRIES = [

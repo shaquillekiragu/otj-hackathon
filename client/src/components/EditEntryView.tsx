@@ -4,39 +4,71 @@ import TagSection from './TagSection'
 import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
 import { type Tag } from '../types/journal'
 import { type JournalEntry } from '../utils/journalData'
+import { type TimesheetEntry } from '../types/timesheet'
 
 interface EditEntryViewProps {
   entryData: JournalEntry | null
   onUpdate: (updates: Partial<JournalEntry>) => void
   onTagsUpdate: (tags: Tag[]) => void
+  onTimesheetsUpdate: (timesheets: TimesheetEntry[]) => void
+  timesheetEntries: TimesheetEntry[]
+  fetchTimesheets: (page: number) => Promise<void>
+  totalPages: number
+  currentPage: number
 }
 
 const EditEntryView = ({
   entryData,
   onUpdate,
-  onTagsUpdate
+  onTagsUpdate,
+  onTimesheetsUpdate,
+  timesheetEntries,
+  fetchTimesheets,
+  totalPages,
+  currentPage
 }: EditEntryViewProps) => {
-  const timesheetProps = useTimesheetManagement()
+  const timesheetProps = useTimesheetManagement({
+    initialEntries: timesheetEntries,
+    fetchTimesheets,
+    totalPages,
+    currentPage,
+    onTimesheetsUpdate
+  })
 
   // Local state for form fields
   const [localData, setLocalData] = useState({
     title: entryData?.title || '',
     category: entryData?.category || '',
-    learningAims: entryData?.learningAims || '',
-    learningMethod: entryData?.learningMethod || '',
-    impact: entryData?.impact || ''
+    intend: entryData?.description.intend || '',
+    implementation: entryData?.description.implementation || '',
+    impact: entryData?.description.impact || ''
   })
 
-  const [selectedTags, setSelectedTags] = useState<Tag[]>(
-    entryData?.selectedTags || []
-  )
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(entryData?.tags || [])
 
   const [showCategoryTooltip, setShowCategoryTooltip] = useState(false)
 
   const handleFieldChange = (field: keyof typeof localData, value: string) => {
     const updated = { ...localData, [field]: value }
     setLocalData(updated)
-    onUpdate(updated)
+
+    // Update with proper description object structure
+    if (
+      field === 'intend' ||
+      field === 'implementation' ||
+      field === 'impact'
+    ) {
+      onUpdate({
+        description: {
+          intend: field === 'intend' ? value : localData.intend,
+          implementation:
+            field === 'implementation' ? value : localData.implementation,
+          impact: field === 'impact' ? value : localData.impact
+        }
+      })
+    } else {
+      onUpdate({ [field]: value })
+    }
   }
 
   const addTag = (tag: Tag) => {
@@ -56,11 +88,11 @@ const EditEntryView = ({
   const sections = [
     {
       title: 'What you were aiming to learn',
-      field: 'learningAims' as keyof typeof localData
+      field: 'intend' as keyof typeof localData
     },
     {
       title: 'How you learnt it',
-      field: 'learningMethod' as keyof typeof localData
+      field: 'implementation' as keyof typeof localData
     },
     { title: 'What was the impact', field: 'impact' as keyof typeof localData }
   ]
@@ -76,7 +108,10 @@ const EditEntryView = ({
           className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 w-2/3"
         />
         <p className="text-sm text-gray-600">
-          Latest time sheet update: {entryData?.lastTimesheetUpdate || 'N/A'}
+          Latest time sheet update:{' '}
+          {entryData
+            ? new Date(entryData.updatedAt).toLocaleDateString('en-GB')
+            : 'N/A'}
         </p>
       </div>
 

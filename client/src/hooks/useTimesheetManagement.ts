@@ -1,107 +1,129 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { TimesheetEntry, NewTimesheetEntry } from '../types/timesheet'
-import {
-  calculateDuration,
-  formatDateForDisplay
-} from '../utils/timeCalculations'
+import { calculateDuration } from '../utils/timeCalculations'
 
-export const useTimesheetManagement = () => {
-  const [currentPage, setCurrentPage] = useState(0)
+interface UseTimesheetManagementProps {
+  initialEntries: TimesheetEntry[]
+  fetchTimesheets: (page: number) => Promise<void>
+  totalPages: number
+  currentPage: number
+  onTimesheetsUpdate?: (timesheets: TimesheetEntry[]) => void
+}
+
+export const useTimesheetManagement = ({
+  initialEntries,
+  fetchTimesheets,
+  totalPages,
+  currentPage,
+  onTimesheetsUpdate
+}: UseTimesheetManagementProps) => {
   const [isAddingTimesheet, setIsAddingTimesheet] = useState(false)
   const [newEntry, setNewEntry] = useState<NewTimesheetEntry>({
     date: '',
-    timeStarted: '',
-    timeFinished: ''
+    startTime: '',
+    endTime: ''
   })
-  const [timesheetEntries, setTimesheetEntries] = useState<TimesheetEntry[][]>([
-    [
-      {
-        id: '1',
-        date: '21 Jan 2026',
-        timeStarted: '14:00',
-        timeFinished: '16:30',
-        duration: '2h 30m'
-      },
-      {
-        id: '2',
-        date: '20 Jan 2026',
-        timeStarted: '09:30',
-        timeFinished: '12:00',
-        duration: '2h 30m'
-      },
-      {
-        id: '3',
-        date: '17 Jan 2026',
-        timeStarted: '10:00',
-        timeFinished: '12:00',
-        duration: '2h'
-      }
-    ],
-    [
-      {
-        id: '4',
-        date: '16 Jan 2026',
-        timeStarted: '13:00',
-        timeFinished: '15:45',
-        duration: '2h 45m'
-      },
-      {
-        id: '5',
-        date: '15 Jan 2026',
-        timeStarted: '09:00',
-        timeFinished: '11:30',
-        duration: '2h 30m'
-      }
-    ]
-  ])
+  const [localTimesheets, setLocalTimesheets] =
+    useState<TimesheetEntry[]>(initialEntries)
+
+  // Update local timesheets when initialEntries changes (e.g., when fetching from API)
+  useEffect(() => {
+    setLocalTimesheets(initialEntries)
+  }, [initialEntries])
+
+  // Use local timesheets for display
+  const timesheetEntries = localTimesheets
 
   const closeTimesheetForm = () => {
     setIsAddingTimesheet(false)
-    setNewEntry({ date: '', timeStarted: '', timeFinished: '' })
+    setNewEntry({ date: '', startTime: '', endTime: '' })
   }
 
   const handleSaveTimesheet = () => {
     const newTimesheetEntry: TimesheetEntry = {
-      id: Date.now().toString(),
-      date: formatDateForDisplay(newEntry.date),
-      timeStarted: newEntry.timeStarted,
-      timeFinished: newEntry.timeFinished,
-      duration: calculateDuration(newEntry.timeStarted, newEntry.timeFinished)
+      date: newEntry.date,
+      startTime: newEntry.startTime,
+      endTime: newEntry.endTime,
+      duration: calculateDuration(newEntry.startTime, newEntry.endTime)
     }
 
-    // Add to the start of the first page
-    setTimesheetEntries((prev) => {
-      const updatedFirstPage = [newTimesheetEntry, ...prev[0]]
-      return [updatedFirstPage, ...prev.slice(1)]
-    })
+    // Add to local state
+    const updatedTimesheets = [newTimesheetEntry, ...localTimesheets]
+    setLocalTimesheets(updatedTimesheets)
+
+    // Notify parent component (for create mode)
+    if (onTimesheetsUpdate) {
+      onTimesheetsUpdate(updatedTimesheets)
+    } else {
+      // For edit mode with existing entries, call API
+      console.log('Save timesheet entry:', newTimesheetEntry)
+      // Navigate to first page to see the new entry after API call
+      fetchTimesheets(1)
+    }
 
     closeTimesheetForm()
   }
 
-  const handleDeleteTimesheet = (id: string) => {
-    // TODO: API call to delete timesheet entry
-    console.log('Delete timesheet entry:', id)
+  const handleDeleteTimesheet = (entry: TimesheetEntry) => {
+    // Remove from local state
+    const updatedTimesheets = localTimesheets.filter(
+      (t) =>
+        !(
+          t.date === entry.date &&
+          t.startTime === entry.startTime &&
+          t.endTime === entry.endTime
+        )
+    )
+    setLocalTimesheets(updatedTimesheets)
+
+    // Notify parent component (for create mode)
+    if (onTimesheetsUpdate) {
+      onTimesheetsUpdate(updatedTimesheets)
+    } else {
+      // For edit mode with existing entries, call API
+      console.log('Delete timesheet entry:', entry)
+    }
   }
 
-  const handleEditTimesheet = (
-    id: string,
-    updatedEntry: Omit<TimesheetEntry, 'id'>
-  ) => {
-    // TODO: API call to update timesheet entry
-    console.log('Edit timesheet entry:', id, updatedEntry)
+  const handleEditTimesheet = (updatedEntry: TimesheetEntry) => {
+    // Update in local state
+    const updatedTimesheets = localTimesheets.map((t) => {
+      // Match by date and original times (this is simplified, may need better identification)
+      if (
+        t.date === updatedEntry.date &&
+        t.startTime === updatedEntry.startTime
+      ) {
+        return updatedEntry
+      }
+      return t
+    })
+    setLocalTimesheets(updatedTimesheets)
+
+    // Notify parent component (for create mode)
+    if (onTimesheetsUpdate) {
+      onTimesheetsUpdate(updatedTimesheets)
+    } else {
+      // For edit mode with existing entries, call API
+      console.log('Edit timesheet entry:', updatedEntry)
+    }
   }
 
   const goToPreviousPage = () => {
-    setCurrentPage((prev) => prev - 1)
+    if (currentPage > 1) {
+      fetchTimesheets(currentPage - 1)
+    }
   }
 
   const goToNextPage = () => {
-    setCurrentPage((prev) => prev + 1)
+    if (currentPage < totalPages) {
+      fetchTimesheets(currentPage + 1)
+    }
   }
 
   return {
     // State
     currentPage,
+    totalPages,
     isAddingTimesheet,
     newEntry,
     timesheetEntries,
