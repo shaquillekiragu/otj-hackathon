@@ -31,43 +31,58 @@ const ReadEntryView = ({
 
   const sections = [
     {
-      title: 'What you were aiming to learn',
+      title:
+        'What skill, knowledge, or behaviour were you aiming to develop or improve?',
       content: entryData.description.intend,
     },
     {
-      title: 'How you learnt it',
+      title:
+        'Briefly describe what you did to learn this (for example: training session, independent study, shadowing, workshop, or practical task).',
       content: entryData.description.implementation,
     },
-    { title: 'What was the impact', content: entryData.description.impact },
+    {
+      title:
+        'What did you learn, and how will this be applied in your role or future work?',
+      content: entryData.description.impact,
+    },
   ];
 
   return (
     <>
-      <div className="flex justify-between mb-2">
-        <h2 className="text-2xl font-bold">{entryData.title}</h2>
-        <p className="text-sm text-gray-600">
-          Latest time sheet update:{' '}
-          {new Date(entryData.updatedAt).toLocaleDateString('en-GB')}
-        </p>
+      <div className="mb-6 pb-4 border-b-2 border-gray-200">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          {entryData.title}
+        </h2>
+        <div className="flex justify-between items-center">
+          <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            {entryData.category}
+          </span>
+          <p className="text-sm text-gray-500">
+            Updated: {new Date(entryData.updatedAt).toLocaleDateString('en-GB')}
+          </p>
+        </div>
       </div>
 
-      <p className="mb-4">{entryData.category}</p>
-
       {sections.map((section, index) => (
-        <div
-          key={index}
-          className={index === sections.length - 1 ? 'mb-6' : 'mb-4'}
-        >
-          <h3 className="text-sm font-semibold text-gray-600 mb-1">
+        <div key={index} className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-300">
             {section.title}
           </h3>
-          <p>{section.content}</p>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              {section.content}
+            </p>
+          </div>
         </div>
       ))}
 
-      <TimesheetSection {...timesheetProps} />
+      <div className="mt-8 pt-6 border-t-2 border-gray-200">
+        <TimesheetSection {...timesheetProps} />
+      </div>
 
-      <TagSection selectedTags={entryData.tags || []} mode="read" />
+      <div className="mt-8">
+        <TagSection selectedTags={entryData.tags || []} mode="read" />
+      </div>
     </>
   );
 };

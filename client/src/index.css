@@ -10,11 +10,19 @@
 h1 {
   font-size: 2.25rem;
   font-weight: 700;
+  color: #1a202c;
 }
 
 h2 {
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
 }
 
 button {
@@ -25,8 +33,47 @@ button {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 button:disabled {
   cursor: not-allowed;
+  opacity: 0.6;
+}
+
+textarea:focus,
+input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Better text box styling */
+textarea,
+input[type='text'],
+select {
+  transition: all 0.2s ease;
+}
+
+textarea:hover,
+input[type='text']:hover,
+select:hover {
+  border-color: #cbd5e1;
+}
+
+/* Card and pagination styling */
+article {
+  transition: all 0.2s ease;
+}
+
+/* Smooth shadows for modern look */
+.shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Pagination button active state */
+button:not(:disabled):active {
+  transform: translateY(0);
 }

@@ -103,39 +103,44 @@ const EditEntryView = ({
 
   const sections = [
     {
-      title: 'What you were aiming to learn',
+      title:
+        'What skill, knowledge, or behaviour were you aiming to develop or improve?',
       field: 'intend' as keyof typeof localData,
     },
     {
-      title: 'How you learnt it',
+      title:
+        'Briefly describe what you did to learn this (for example: training session, independent study, shadowing, workshop, or practical task).',
       field: 'implementation' as keyof typeof localData,
     },
-    { title: 'What was the impact', field: 'impact' as keyof typeof localData },
+    {
+      title:
+        'What did you learn, and how will this be applied in your role or future work?',
+      field: 'impact' as keyof typeof localData,
+    },
   ];
 
   return (
     <>
-      <div className="flex justify-between mb-2">
+      <div className="mb-6 pb-4 border-b-2 border-gray-200">
         <input
           type="text"
           value={localData.title}
           onChange={(e) => handleFieldChange('title', e.target.value)}
-          placeholder="Title..."
-          className="text-2xl font-bold border border-gray-300 rounded px-2 py-1 w-2/3"
+          placeholder="Title"
+          className="text-3xl font-bold text-gray-900 border-b-2 border-transparent focus:border-blue-500 focus:outline-none pb-2 w-full transition-colors mb-3"
         />
-        <p className="text-sm text-gray-600">
-          Latest time sheet update:{' '}
+        <p className="text-sm text-gray-500">
           {entryData
-            ? new Date(entryData.updatedAt).toLocaleDateString('en-GB')
-            : 'N/A'}
+            ? `Last updated: ${new Date(entryData.updatedAt).toLocaleDateString('en-GB')}`
+            : 'New entry'}
         </p>
       </div>
 
-      <div className="mb-4 flex items-center gap-2 relative">
+      <div className="mb-6 flex items-center gap-3 relative">
         <select
           value={localData.category}
           onChange={(e) => handleFieldChange('category', e.target.value)}
-          className="flex-1 border border-gray-300 rounded px-2 py-1"
+          className="flex-1 border-2 border-gray-300 rounded-lg px-4 py-2 text-gray-700 font-medium focus:border-blue-500 focus:outline-none transition-colors"
         >
           <option value="">Select a category...</option>
           <option value="Technical Skills">Technical Skills</option>
@@ -149,7 +154,7 @@ const EditEntryView = ({
           <button
             type="button"
             onClick={() => setShowCategoryTooltip(!showCategoryTooltip)}
-            className="w-5 h-5 rounded-full !border-2 !border-blue-500 !bg-white !text-blue-500 flex items-center justify-center text-xs font-bold hover:!border-blue-600 hover:!text-blue-600 cursor-help flex-shrink-0"
+            className="w-6 h-6 rounded-full border-2 border-blue-500 bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold hover:bg-blue-100 hover:border-blue-600 cursor-help flex-shrink-0 transition-colors"
           >
             ?
           </button>
@@ -172,30 +177,35 @@ const EditEntryView = ({
       </div>
 
       {sections.map((section, index) => (
-        <div
-          key={index}
-          className={index === sections.length - 1 ? 'mb-6' : 'mb-4'}
-        >
-          <h3 className="text-sm font-semibold text-gray-600 mb-1">
+        <div key={index} className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-300">
             {section.title}
           </h3>
           <textarea
             value={localData[section.field]}
             maxLength={500}
             onChange={(e) => handleFieldChange(section.field, e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1 min-h-20"
+            required
+            className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 min-h-24 focus:border-blue-500 focus:outline-none resize-none transition-colors text-gray-700"
           />
+          <p className="text-xs text-gray-500 mt-2">
+            {localData[section.field].length}/500 characters
+          </p>
         </div>
       ))}
 
-      <TimesheetSection {...timesheetProps} />
+      <div className="mt-8 pt-6 border-t-2 border-gray-200">
+        <TimesheetSection {...timesheetProps} />
+      </div>
 
-      <TagSection
-        selectedTags={selectedTags}
-        mode="edit"
-        onAddTag={addTag}
-        onRemoveTag={removeTag}
-      />
+      <div className="mt-8">
+        <TagSection
+          selectedTags={selectedTags}
+          mode="edit"
+          onAddTag={addTag}
+          onRemoveTag={removeTag}
+        />
+      </div>
     </>
   );
 };
