@@ -8,6 +8,7 @@ import { type TimesheetEntry } from '../types/timesheet';
 import { useJournalEntry } from '../hooks/useJournalEntry';
 import { useCreateJournalEntry } from '../hooks/useCreateJournalEntry';
 import { useDeleteJournalEntry } from '../hooks/useDeleteJournalEntry';
+import { useUpdateJournalEntry } from '../hooks/useUpdateJournalEntry';
 
 const USER_ID = '64eea3f8b1234567890abcde';
 
@@ -17,6 +18,7 @@ interface ModalProps {
   onClose: () => void;
   entryId: string;
   onDelete?: () => void;
+  onUpdate?: () => void;
 }
 
 interface ButtonConfig {
@@ -33,7 +35,7 @@ const buttonStyles = {
   secondary: '!bg-gray-400 !text-gray-800 hover:!bg-gray-500',
 };
 
-const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
+const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
   const initialView = entryId ? 'readEntry' : 'create';
   const [view, setView] = useState<ModalView>(initialView);
   const {
@@ -48,6 +50,7 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
   } = useJournalEntry(entryId);
   const { createJournalEntry } = useCreateJournalEntry();
   const { deleteJournalEntry, loading: isDeleting } = useDeleteJournalEntry();
+  const { updateJournalEntry, loading: isUpdating } = useUpdateJournalEntry();
   const [editData, setEditData] = useState<JournalEntry | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
@@ -87,12 +90,29 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
       }
     } else if (entryId && view === 'edit') {
       // Update existing entry
-      // TODO: Implement update logic
-      console.log('Update entry', editData);
+      if (!editData) {
+        console.error('No data to update');
+        return;
+      }
 
-      await refetch();
-      setEditData(null);
-      setView('readEntry');
+      const updatedEntry = await updateJournalEntry(entryId, {
+        userId: USER_ID,
+        title: editData.title || '',
+        category: editData.category || '',
+        description: {
+          intend: editData.description?.intend || '',
+          implementation: editData.description?.implementation || '',
+          impact: editData.description?.impact || '',
+        },
+        tags: editData.tags || [],
+        timeSheets: editData.timeSheets || [],
+      });
+
+      if (updatedEntry) {
+        await refetch();
+        onUpdate?.();
+        setView('readEntry');
+      }
     }
   };
 
@@ -121,6 +141,29 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
 
   const handleDeleteCancel = () => {
     setShowDeleteConfirmation(false);
+  };
+
+  const handleTimesheetUpdate = async (updatedTimesheets: TimesheetEntry[]) => {
+    if (!entryId || !entryData) {
+      console.error('No entry to update');
+      return;
+    }
+
+    await updateJournalEntry(entryId, {
+      userId: USER_ID,
+      title: entryData.title || '',
+      category: entryData.category || '',
+      description: {
+        intend: entryData.description?.intend || '',
+        implementation: entryData.description?.implementation || '',
+        impact: entryData.description?.impact || '',
+      },
+      tags: entryData.tags || [],
+      timeSheets: updatedTimesheets,
+    });
+
+    await refetch();
+    onUpdate?.();
   };
 
   const getFooterButtons = (): ButtonConfig[] => {
@@ -158,7 +201,10 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
         label: 'Edit',
         onClick: () => {
           if (entryData) {
-            setEditData(entryData);
+            setEditData({
+              ...entryData,
+              timeSheets: timesheets || entryData.timeSheets || [],
+            });
           }
           setView('edit');
         },
@@ -271,6 +317,7 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
             fetchTimesheets={fetchTimesheets}
             totalPages={totalPages}
             currentPage={currentPage}
+            onTimesheetUpdate={handleTimesheetUpdate}
           />
         ) : null;
       }
@@ -308,6 +355,7 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
             fetchTimesheets={fetchTimesheets}
             totalPages={totalPages}
             currentPage={currentPage}
+            onTimesheetUpdate={handleTimesheetUpdate}
           />
         ) : null;
     }
@@ -333,16 +381,22 @@ const Modal = ({ onClose, entryId, onDelete }: ModalProps) => {
               <button
                 key={btn.label}
                 onClick={btn.onClick}
-                disabled={isDeleting && btn.label === 'Delete'}
+                disabled={
+                  (isDeleting && btn.label === 'Delete') ||
+                  (isUpdating && btn.label === 'Save')
+                }
                 className={`${buttonStyles.base} ${buttonStyles[btn.variant]} ${
-                  isDeleting && btn.label === 'Delete'
-                    ? 'opacity-50! cursor-not-allowed!'
+                  (isDeleting && btn.label === 'Delete') ||
+                  (isUpdating && btn.label === 'Save')
+                    ? '!opacity-50 !cursor-not-allowed'
                     : ''
                 }`}
               >
                 {isDeleting && btn.label === 'Delete'
                   ? 'Deleting...'
-                  : btn.label}
+                  : isUpdating && btn.label === 'Save'
+                    ? 'Saving...'
+                    : btn.label}
               </button>
             ))}
           </div>

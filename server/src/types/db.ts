@@ -30,6 +30,7 @@ export type Description = {
 };
 
 export type TimeSheet = {
+  _id?: ObjectId;
   date: Date;
   startTime: Date;
   endTime: Date;

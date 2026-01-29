@@ -1,15 +1,16 @@
-import TimesheetSection from './TimesheetSection'
-import TagSection from './TagSection'
-import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
-import { type JournalEntry } from '../utils/journalData'
-import { type TimesheetEntry } from '../types/timesheet'
+import TimesheetSection from './TimesheetSection';
+import TagSection from './TagSection';
+import { useTimesheetManagement } from '../hooks/useTimesheetManagement';
+import { type JournalEntry } from '../utils/journalData';
+import { type TimesheetEntry } from '../types/timesheet';
 
 interface ReadEntryViewProps {
-  entryData: JournalEntry
-  timesheetEntries: TimesheetEntry[]
-  fetchTimesheets: (page: number) => Promise<void>
-  totalPages: number
-  currentPage: number
+  entryData: JournalEntry;
+  timesheetEntries: TimesheetEntry[];
+  fetchTimesheets: (page: number) => Promise<void>;
+  totalPages: number;
+  currentPage: number;
+  onTimesheetUpdate?: (updatedTimesheets: TimesheetEntry[]) => Promise<void>;
 }
 
 const ReadEntryView = ({
@@ -17,26 +18,28 @@ const ReadEntryView = ({
   timesheetEntries,
   fetchTimesheets,
   totalPages,
-  currentPage
+  currentPage,
+  onTimesheetUpdate,
 }: ReadEntryViewProps) => {
   const timesheetProps = useTimesheetManagement({
     initialEntries: timesheetEntries,
     fetchTimesheets,
     totalPages,
-    currentPage
-  })
+    currentPage,
+    onTimesheetsUpdate: onTimesheetUpdate,
+  });
 
   const sections = [
     {
       title: 'What you were aiming to learn',
-      content: entryData.description.intend
+      content: entryData.description.intend,
     },
     {
       title: 'How you learnt it',
-      content: entryData.description.implementation
+      content: entryData.description.implementation,
     },
-    { title: 'What was the impact', content: entryData.description.impact }
-  ]
+    { title: 'What was the impact', content: entryData.description.impact },
+  ];
 
   return (
     <>
@@ -66,7 +69,7 @@ const ReadEntryView = ({
 
       <TagSection selectedTags={entryData.tags || []} mode="read" />
     </>
-  )
-}
+  );
+};
 
-export default ReadEntryView
+export default ReadEntryView;

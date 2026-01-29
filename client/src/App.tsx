@@ -29,6 +29,7 @@ const App = () => {
           }}
           entryId={entryToView}
           onDelete={refetch}
+          onUpdate={refetch}
         />
       )}
 

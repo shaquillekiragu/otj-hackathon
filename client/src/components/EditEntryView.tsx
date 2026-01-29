@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import TimesheetSection from './TimesheetSection'
-import TagSection from './TagSection'
-import { useTimesheetManagement } from '../hooks/useTimesheetManagement'
-import { type Tag } from '../types/journal'
-import { type JournalEntry } from '../utils/journalData'
-import { type TimesheetEntry } from '../types/timesheet'
+import { useState, useEffect } from 'react';
+import TimesheetSection from './TimesheetSection';
+import TagSection from './TagSection';
+import { useTimesheetManagement } from '../hooks/useTimesheetManagement';
+import { type Tag } from '../types/journal';
+import { type JournalEntry } from '../utils/journalData';
+import { type TimesheetEntry } from '../types/timesheet';
 
 interface EditEntryViewProps {
-  entryData: JournalEntry | null
-  onUpdate: (updates: Partial<JournalEntry>) => void
-  onTagsUpdate: (tags: Tag[]) => void
-  onTimesheetsUpdate: (timesheets: TimesheetEntry[]) => void
-  timesheetEntries: TimesheetEntry[]
-  fetchTimesheets: (page: number) => Promise<void>
-  totalPages: number
-  currentPage: number
+  entryData: JournalEntry | null;
+  onUpdate: (updates: Partial<JournalEntry>) => void;
+  onTagsUpdate: (tags: Tag[]) => void;
+  onTimesheetsUpdate: (timesheets: TimesheetEntry[]) => void;
+  timesheetEntries: TimesheetEntry[];
+  fetchTimesheets: (page: number) => Promise<void>;
+  totalPages: number;
+  currentPage: number;
 }
 
 const EditEntryView = ({
@@ -25,15 +25,15 @@ const EditEntryView = ({
   timesheetEntries,
   fetchTimesheets,
   totalPages,
-  currentPage
+  currentPage,
 }: EditEntryViewProps) => {
   const timesheetProps = useTimesheetManagement({
     initialEntries: timesheetEntries,
     fetchTimesheets,
     totalPages,
     currentPage,
-    onTimesheetsUpdate
-  })
+    onTimesheetsUpdate,
+  });
 
   // Local state for form fields
   const [localData, setLocalData] = useState({
@@ -41,16 +41,32 @@ const EditEntryView = ({
     category: entryData?.category || '',
     intend: entryData?.description.intend || '',
     implementation: entryData?.description.implementation || '',
-    impact: entryData?.description.impact || ''
-  })
+    impact: entryData?.description.impact || '',
+  });
 
-  const [selectedTags, setSelectedTags] = useState<Tag[]>(entryData?.tags || [])
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(
+    entryData?.tags || [],
+  );
 
-  const [showCategoryTooltip, setShowCategoryTooltip] = useState(false)
+  const [showCategoryTooltip, setShowCategoryTooltip] = useState(false);
+
+  // Update local state when entryData changes
+  useEffect(() => {
+    if (entryData) {
+      setLocalData({
+        title: entryData.title || '',
+        category: entryData.category || '',
+        intend: entryData.description?.intend || '',
+        implementation: entryData.description?.implementation || '',
+        impact: entryData.description?.impact || '',
+      });
+      setSelectedTags(entryData.tags || []);
+    }
+  }, [entryData]);
 
   const handleFieldChange = (field: keyof typeof localData, value: string) => {
-    const updated = { ...localData, [field]: value }
-    setLocalData(updated)
+    const updated = { ...localData, [field]: value };
+    setLocalData(updated);
 
     // Update with proper description object structure
     if (
@@ -63,39 +79,39 @@ const EditEntryView = ({
           intend: field === 'intend' ? value : localData.intend,
           implementation:
             field === 'implementation' ? value : localData.implementation,
-          impact: field === 'impact' ? value : localData.impact
-        }
-      })
+          impact: field === 'impact' ? value : localData.impact,
+        },
+      });
     } else {
-      onUpdate({ [field]: value })
+      onUpdate({ [field]: value });
     }
-  }
+  };
 
   const addTag = (tag: Tag) => {
     if (!selectedTags.find((t) => t.id === tag.id)) {
-      const updatedTags = [...selectedTags, tag]
-      setSelectedTags(updatedTags)
-      onTagsUpdate(updatedTags)
+      const updatedTags = [...selectedTags, tag];
+      setSelectedTags(updatedTags);
+      onTagsUpdate(updatedTags);
     }
-  }
+  };
 
   const removeTag = (tagId: string) => {
-    const updatedTags = selectedTags.filter((t) => t.id !== tagId)
-    setSelectedTags(updatedTags)
-    onTagsUpdate(updatedTags)
-  }
+    const updatedTags = selectedTags.filter((t) => t.id !== tagId);
+    setSelectedTags(updatedTags);
+    onTagsUpdate(updatedTags);
+  };
 
   const sections = [
     {
       title: 'What you were aiming to learn',
-      field: 'intend' as keyof typeof localData
+      field: 'intend' as keyof typeof localData,
     },
     {
       title: 'How you learnt it',
-      field: 'implementation' as keyof typeof localData
+      field: 'implementation' as keyof typeof localData,
     },
-    { title: 'What was the impact', field: 'impact' as keyof typeof localData }
-  ]
+    { title: 'What was the impact', field: 'impact' as keyof typeof localData },
+  ];
 
   return (
     <>
@@ -181,7 +197,7 @@ const EditEntryView = ({
         onRemoveTag={removeTag}
       />
     </>
-  )
-}
+  );
+};
 
-export default EditEntryView
+export default EditEntryView;
