@@ -11,6 +11,7 @@ import {
   validateUserIdInParams,
   validateJournalIdInParams,
   validatePaginationParams,
+  validateSearchAndFilterParams,
 } from '../middleware/journalEntry/validation';
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.get(
   '/',
   validateUserIdInParams,
   validatePaginationParams,
+  validateSearchAndFilterParams,
   listJournalEntriesByUser,
 );
 

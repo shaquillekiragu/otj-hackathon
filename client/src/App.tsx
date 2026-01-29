@@ -13,6 +13,9 @@ const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [entryToView, setEntryToView] = useState('');
+  const [search, setSearch] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
   const {
     loading,
     entries,
@@ -22,7 +25,7 @@ const App = () => {
     totalPages,
     goToNextPage,
     goToPreviousPage,
-  } = useJournalEntries();
+  } = useJournalEntries({ search, tags: selectedTags });
 
   const handleJournalCardClick = (id: string) => {
     setEntryToView(id);
@@ -66,7 +69,10 @@ const App = () => {
             Log OTJ
           </button>
 
-          <SearchFilters />
+          <SearchFilters
+            onSearchChange={setSearch}
+            onTagsChange={setSelectedTags}
+          />
 
           <JournalTimeline
             handleClick={handleJournalCardClick}
