@@ -102,6 +102,8 @@ export const listJournalEntriesByUserIdService = async (
   userId: string,
   page?: string,
   limit?: string,
+  search?: string,
+  tags?: string[],
 ) => {
   if (!userId) throw new ApiError('Missing userId', 400);
 
@@ -111,7 +113,24 @@ export const listJournalEntriesByUserIdService = async (
 
   const { page: pageNum, limit: limitNum, skip } = getPagination(page, limit);
 
-  const query = { userId: new ObjectId(userId) };
+  // Build dynamic query
+  const query: any = { userId: new ObjectId(userId) };
+
+  // Add search condition for title and description fields
+  if (search && search.trim()) {
+    const searchRegex = new RegExp(search.trim(), 'i'); // case-insensitive
+    query.$or = [
+      { title: searchRegex },
+      { 'description.intend': searchRegex },
+      { 'description.implementation': searchRegex },
+      { 'description.impact': searchRegex },
+    ];
+  }
+
+  // Add tags filter - match entries that have ALL specified tags
+  if (tags && tags.length > 0) {
+    query['tags.tagDescription'] = { $all: tags };
+  }
 
   const totalEntries = await journalEntriesCollection().countDocuments(query);
   const totalPages = Math.ceil(totalEntries / limitNum);
