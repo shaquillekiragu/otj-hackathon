@@ -13,7 +13,16 @@ const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [entryToView, setEntryToView] = useState('');
-  const { loading, entries, error, refetch } = useJournalEntries();
+  const {
+    loading,
+    entries,
+    error,
+    refetch,
+    currentPage,
+    totalPages,
+    goToNextPage,
+    goToPreviousPage,
+  } = useJournalEntries();
 
   const handleJournalCardClick = (id: string) => {
     setEntryToView(id);
@@ -64,6 +73,10 @@ const App = () => {
             entries={entries}
             loading={loading}
             error={error}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onNextPage={goToNextPage}
+            onPreviousPage={goToPreviousPage}
           />
         </div>
       </main>

@@ -7,6 +7,10 @@ interface JournalTimelineProps {
   entries: JournalEntry[];
   loading: boolean;
   error: string | null;
+  currentPage: number;
+  totalPages: number;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
 }
 
 const JournalTimeline = ({
@@ -14,7 +18,14 @@ const JournalTimeline = ({
   entries,
   loading,
   error,
+  currentPage,
+  totalPages,
+  onNextPage,
+  onPreviousPage,
 }: JournalTimelineProps) => {
+  const paginationButtonClass =
+    'px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed';
+
   if (error) {
     return (
       <div className="flex justify-center p-8 text-red-500">Error: {error}</div>
@@ -60,6 +71,27 @@ const JournalTimeline = ({
           </div>
         );
       })}
+      {entries.length > 0 && (
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button
+            onClick={onPreviousPage}
+            disabled={currentPage === 1}
+            className={paginationButtonClass}
+          >
+            ←
+          </button>
+          <span className="text-sm text-gray-600">
+            {currentPage}/{totalPages}
+          </span>
+          <button
+            onClick={onNextPage}
+            disabled={currentPage === totalPages}
+            className={paginationButtonClass}
+          >
+            →
+          </button>
+        </div>
+      )}
     </section>
   );
 };
