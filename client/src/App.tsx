@@ -37,7 +37,7 @@ const App = () => {
         />
       )}
 
-      <div className="flex flex-col items-center justify-start p-4 gap-6">
+      <div className="flex flex-col items-center justify-start p-4 gap-6 my-10 overflow-x-hidden">
         <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
           <div className="w-full">
             <div className="mb-6">
