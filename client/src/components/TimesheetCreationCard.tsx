@@ -24,7 +24,7 @@ const TimesheetCreationCard = ({
   const calculatedDuration = calculateDuration(startTime, endTime)
 
   return (
-    <div className="border border-blue-300 rounded-lg px-4 py-3 bg-blue-50">
+    <article className="border border-blue-300 rounded-lg px-4 py-3 bg-blue-50">
       <div className="flex items-center gap-4">
         <div className="flex flex-col gap-1 flex-1">
           <label className="text-xs text-gray-500 font-medium">Date:</label>
@@ -74,7 +74,7 @@ const TimesheetCreationCard = ({
           </button>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 

@@ -1,18 +1,23 @@
 import { useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHandPointer } from '@fortawesome/free-regular-svg-icons/faHandPointer'
 import JournalTimeline from './components/JournalTimeline'
 import SearchFilters from './components/SearchFilters'
 import Modal from './components/Modal'
-import ProgressTracker from './components/ProgressTracker'
-import otjRequirements from './assets/otj-requirements.png'
+import HeaderSection from './components/HeaderSection'
+import ProgressDiagram from './components/ProgressDiagram'
+import ProgressTrackerModal from './components/ProgressTrackerModal'
 
 const App = () => {
   const [showModal, setShowModal] = useState(false)
   const [entryToView, setEntryToView] = useState('')
+  const [showProgressModal, setShowProgressModal] = useState(false)
 
   const handleJournalCardClick = (id: string) => {
     setEntryToView(id)
     setShowModal(true)
   }
+
   return (
     <>
       {showModal && (
@@ -24,33 +29,37 @@ const App = () => {
           entryId={entryToView}
         />
       )}
-      <div className="flex flex-col items-center justify-start p-4 gap-4">
-        <div className="w-full">
-          <h1>Log Off-the-Job Activities</h1>
-          <h2>
-            Off-the-Job (OTJ) training refers to learning activities that take
-            place during your paid working hours, but that are not part of your
-            day-to-day duties. You can see more information on what counts as
-            OTJ training{' '}
-            <a
-              href={otjRequirements}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 underline"
-            >
-              here
-            </a>
-            .
-          </h2>
-          <h2>You are currently 3 hours ahead of expectations.</h2>
+
+      {showProgressModal && (
+        <ProgressTrackerModal
+          onClose={() => setShowProgressModal(false)}
+        />
+      )}
+
+      <main className="flex flex-col items-center p-4 gap-6 my-10 overflow-x-hidden">
+        <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          <HeaderSection />
+
+          <div className="w-full lg:sticky lg:top-10 flex flex-col items-center lg:items-end">
+            <div className='flex flex-col items-center gap-3'>
+              <ProgressDiagram onClick={() => setShowProgressModal(true)} />
+              <div className="flex items-center gap-1.5 text-xs text-gray-400 italic">
+                <FontAwesomeIcon icon={faHandPointer} className="w-3 h-3" />
+                <span>Click to view details</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <button className="px-12!" onClick={() => setShowModal(true)}>
-          Log OTJ
-        </button>
-        <SearchFilters />
-        <JournalTimeline handleClick={handleJournalCardClick} />
-        <ProgressTracker />
-      </div>
+
+        <div className="w-full max-w-5xl flex flex-col items-center gap-6">
+          <button className="px-12!" onClick={() => setShowModal(true)}>
+            Log OTJ
+          </button>
+
+          <SearchFilters />
+          <JournalTimeline handleClick={handleJournalCardClick} />
+        </div>
+      </main>
     </>
   )
 }

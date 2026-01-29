@@ -37,7 +37,7 @@ const TimesheetSection = ({
     'px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
 
   return (
-    <div className="mb-6">
+    <section className="mb-6">
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-sm font-semibold text-gray-600">
           Timesheet Entries
@@ -106,7 +106,7 @@ const TimesheetSection = ({
           </button>
         </div>
       )}
-    </div>
+    </section>
   )
 }
 

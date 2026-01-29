@@ -16,7 +16,7 @@ const JournalListCard = ({
   lastUpdated
 }: JournalListCardProps) => {
   return (
-    <div className="p-4 border rounded-lg hover:border-[#0055ff] hover:bg-[#e4edff] hover:cursor-pointer transition-colors">
+    <article className="p-4 border rounded-lg hover:border-[#0055ff] hover:bg-[#e4edff] hover:cursor-pointer transition-colors">
       <div className="flex flex-col gap-2">
         {/* Title */}
         <h3 className="font-semibold text-lg text-gray-900">{title}</h3>
@@ -47,7 +47,7 @@ const JournalListCard = ({
           </div>
         )}
       </div>
-    </div>
+    </article>
   )
 }
 

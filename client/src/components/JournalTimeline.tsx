@@ -19,7 +19,7 @@ const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
     return <div className="flex justify-center p-8">Loading entries...</div>
   }
   return (
-    <div className="flex flex-col w-full px-8">
+    <section className="flex flex-col w-full px-8">
       {entries.map((entry, index) => {
         // Get the most recent timesheet entry date
         const latestDate =
@@ -54,7 +54,7 @@ const JournalTimeline = ({ handleClick }: JournalTimelineProps) => {
           </div>
         )
       })}
-    </div>
+    </section>
   )
 }
 

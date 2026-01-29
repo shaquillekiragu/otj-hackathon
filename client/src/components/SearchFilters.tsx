@@ -53,7 +53,7 @@ const SearchFilters = () => {
   }, [searchTerm])
 
   return (
-    <div className="flex flex-col items-start justify-start gap-1 lg:flex-row lg:items-end lg:justify-between w-full lg:pr-8">
+    <article className="w-full flex flex-col lg:flex-row lg:justify-between lg:items-end gap-1 lg:pr-8">
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium">Search</label>
         <input
@@ -79,7 +79,7 @@ const SearchFilters = () => {
           </div>
         ))}
       </div>
-    </div>
+    </article>
   )
 }
 
