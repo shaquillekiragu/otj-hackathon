@@ -21,6 +21,30 @@ export const syncUserTags = async (
   }
 };
 
+export const createUserTagService = async (
+  userId: string,
+  tagInput: TagInput,
+) => {
+  if (!ObjectId.isValid(userId)) {
+    throw new ApiError(`Invalid userId format: ${userId}`, 400);
+  }
+
+  const userObjectId = new ObjectId(userId);
+  const newTag: TagDocument = {
+    _id: new ObjectId(),
+    userId: userObjectId,
+    ...tagInput,
+  };
+
+  const result = await tagsCollection().insertOne(newTag);
+
+  if (!result.insertedId) {
+    throw new ApiError('Failed to create tag', 500);
+  }
+
+  return { _id: result.insertedId, ...newTag };
+};
+
 export const getTagsByUserService = async (userId: string) => {
   const userObjectId = new ObjectId(userId);
   return getUserTags(userObjectId);

@@ -71,3 +71,26 @@ export const validatePaginationParams = (
 
   next();
 };
+
+export const validateSearchAndFilterParams = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  // Validate and sanitize search parameter
+  if (req.query.search) {
+    const search = req.query.search as string;
+    // Basic sanitization - trim whitespace
+    req.query.search = search.trim();
+  }
+
+  // Validate tags parameter - just ensure it's a string, parsing will happen in controller
+  if (req.query.tags && typeof req.query.tags !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid tags parameter format',
+    });
+  }
+
+  next();
+};

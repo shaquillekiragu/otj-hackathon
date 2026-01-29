@@ -1,14 +1,17 @@
-import { useState } from 'react'
-import { PLACEHOLDER_TAGS, type Tag } from '../types/journal'
-import { faTrashCan } from '@fortawesome/free-regular-svg-icons/faTrashCan'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useState } from 'react';
+import { type Tag } from '../types/journal';
+import { faTrashCan } from '@fortawesome/free-regular-svg-icons/faTrashCan';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useUserTags } from '../hooks/useUserTags';
+import { useDeleteTag } from '../hooks/useDeleteTag';
+import { useCreateTag } from '../hooks/useCreateTag';
 
 interface TagSectionProps {
-  selectedTags: Tag[]
-  mode: 'read' | 'edit'
-  onAddTag?: (tag: Tag) => void
-  onRemoveTag?: (tagId: string) => void
-  onDeleteTag?: (tagId: string) => void
+  selectedTags: Tag[];
+  mode: 'read' | 'edit';
+  onAddTag?: (tag: Tag) => void;
+  onRemoveTag?: (tagId: string) => void;
+  onDeleteTag?: (tagId: string) => void;
 }
 
 const TagSection = ({
@@ -16,48 +19,65 @@ const TagSection = ({
   mode,
   onAddTag,
   onRemoveTag,
-  onDeleteTag
+  onDeleteTag,
 }: TagSectionProps) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedColor, setSelectedColor] = useState('#3B82F6')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedColor, setSelectedColor] = useState('#3B82F6');
+  const {
+    tags: userTags,
+    loading: tagsLoading,
+    refetch: refetchTags,
+  } = useUserTags();
+  const { deleteTag, loading: isDeleting } = useDeleteTag();
+  const { createTag, loading: isCreating } = useCreateTag();
 
-  const availableTags = PLACEHOLDER_TAGS.filter(
-    (tag) => !selectedTags.find((t) => t.id === tag.id)
-  )
+  const availableTags = userTags.filter(
+    (tag) => !selectedTags.find((t) => t.id === tag.id),
+  );
 
   const filteredTags = availableTags.filter((tag) =>
-    tag.tagDescription.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    tag.tagDescription.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const handleAddTag = (tag: Tag) => {
-    onAddTag?.(tag)
-    setSearchQuery('')
-    setIsDropdownOpen(false)
-  }
+    onAddTag?.(tag);
+    setSearchQuery('');
+    setIsDropdownOpen(false);
+  };
 
   const handleCloseDropdown = () => {
-    setIsDropdownOpen(false)
-    setSearchQuery('')
-    setSelectedColor('#3B82F6')
-  }
+    setIsDropdownOpen(false);
+    setSearchQuery('');
+    setSelectedColor('#3B82F6');
+  };
 
-  const handleCreateTag = () => {
-    if (!searchQuery.trim()) return
+  const handleCreateTag = async () => {
+    if (!searchQuery.trim()) return;
 
-    const newTag: Tag = {
-      id: `temp-${Date.now()}`,
-      tagDescription: searchQuery.trim(),
-      tagColour: selectedColor
+    const createdTag = await createTag(searchQuery.trim(), selectedColor);
+
+    if (createdTag) {
+      onAddTag?.(createdTag);
+      setSearchQuery('');
+      setSelectedColor('#3B82F6');
+      setIsDropdownOpen(false);
+      // Refetch to update available tags
+      await refetchTags();
     }
+  };
 
-    onAddTag?.(newTag)
-    setSearchQuery('')
-    setSelectedColor('#3B82F6')
-    setIsDropdownOpen(false)
-  }
+  const handleDeleteTag = async (tagId: string) => {
+    const success = await deleteTag(tagId);
+    if (success) {
+      // Call the parent's onDeleteTag callback if provided
+      onDeleteTag?.(tagId);
+      // Refetch the tags to update the list
+      await refetchTags();
+    }
+  };
 
-  const showCreateOption = searchQuery.trim() && filteredTags.length === 0
+  const showCreateOption = searchQuery.trim() && filteredTags.length === 0;
 
   return (
     <section className="mt-6">
@@ -98,7 +118,11 @@ const TagSection = ({
                 />
                 <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-300 rounded-lg shadow-lg z-20 w-96 flex flex-col">
                   <div className="max-h-64 overflow-y-auto flex-1">
-                    {filteredTags.length > 0 ? (
+                    {tagsLoading ? (
+                      <div className="px-4 py-3 text-gray-500 text-sm">
+                        Loading tags...
+                      </div>
+                    ) : filteredTags.length > 0 ? (
                       filteredTags.map((tag) => (
                         <div
                           key={tag.id}
@@ -119,10 +143,11 @@ const TagSection = ({
                             <button
                               type="button"
                               onClick={(e) => {
-                                e.stopPropagation()
-                                onDeleteTag?.(tag.id)
+                                e.stopPropagation();
+                                handleDeleteTag(tag.id);
                               }}
-                              className="!text-gray-400 hover:!text-red-600 !bg-transparent !border-none !text-xl !p-0 !m-0 cursor-pointer"
+                              disabled={isDeleting}
+                              className="!text-gray-400 hover:!text-red-600 disabled:!opacity-50 disabled:!cursor-not-allowed !bg-transparent !border-none !text-xl !p-0 !m-0 cursor-pointer"
                               title="Delete tag"
                             >
                               <FontAwesomeIcon icon={faTrashCan} />
@@ -135,18 +160,22 @@ const TagSection = ({
                         <button
                           type="button"
                           onClick={handleCreateTag}
-                          className="!flex-1 hover:!bg-blue-50 !flex !items-center !gap-2 !bg-transparent !border-none !text-left !rounded !px-2 !py-1 cursor-pointer"
+                          disabled={isCreating}
+                          className="!flex-1 hover:!bg-blue-50 disabled:!opacity-50 disabled:!cursor-not-allowed !flex !items-center !gap-2 !bg-transparent !border-none !text-left !rounded !px-2 !py-1 cursor-pointer"
                         >
                           <span className="text-blue-600 font-semibold">+</span>
                           <span className="text-gray-700">
-                            Create tag "{searchQuery.trim()}"
+                            {isCreating
+                              ? 'Creating...'
+                              : `Create tag "${searchQuery.trim()}"`}
                           </span>
                         </button>
                         <input
                           type="color"
                           value={selectedColor}
                           onChange={(e) => setSelectedColor(e.target.value)}
-                          className="w-16 h-8 rounded cursor-pointer border border-gray-300"
+                          disabled={isCreating}
+                          className="w-16 h-8 rounded cursor-pointer border border-gray-300 disabled:!opacity-50"
                           title="Choose tag color"
                         />
                       </div>
@@ -173,7 +202,7 @@ const TagSection = ({
         )}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default TagSection
+export default TagSection;

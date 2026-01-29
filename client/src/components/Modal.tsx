@@ -87,6 +87,8 @@ const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
         setEditData(createdEntry);
         // Switch to read view to show the newly created entry
         setView('readEntry');
+        // Notify parent to refetch the list
+        onUpdate?.();
       }
     } else if (entryId && view === 'edit') {
       // Update existing entry
@@ -200,10 +202,12 @@ const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
       {
         label: 'Edit',
         onClick: () => {
-          if (entryData) {
+          // Use editData if available (newly created entry), otherwise use entryData
+          const dataToEdit = editData || entryData;
+          if (dataToEdit) {
             setEditData({
-              ...entryData,
-              timeSheets: timesheets || entryData.timeSheets || [],
+              ...dataToEdit,
+              timeSheets: timesheets || dataToEdit.timeSheets || [],
             });
           }
           setView('edit');
@@ -310,10 +314,12 @@ const Modal = ({ onClose, entryId, onDelete, onUpdate }: ModalProps) => {
       case 'readEntry': {
         // Use editData if available (after creating), otherwise use entryData
         const dataToShow = editData || entryData;
+        // If we just created an entry, use timeSheets from editData; otherwise use timesheets from API
+        const timesheetEntriesToShow = editData?.timeSheets || timesheets;
         return dataToShow ? (
           <ReadEntryView
             entryData={dataToShow}
-            timesheetEntries={timesheets}
+            timesheetEntries={timesheetEntriesToShow}
             fetchTimesheets={fetchTimesheets}
             totalPages={totalPages}
             currentPage={currentPage}

@@ -38,12 +38,22 @@ export const getJournalEntry = async (req: Request, res: Response) => {
 };
 
 export const listJournalEntriesByUser = async (req: Request, res: Response) => {
-  const { page, limit, userId } = req.query;
+  const { page, limit, userId, search, tags } = req.query;
   try {
+    // Parse tags from comma-separated string if present
+    const parsedTags = tags
+      ? (tags as string)
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0)
+      : undefined;
+
     const journalEntries = await listJournalEntriesByUserIdService(
       userId as string,
       page as string,
       limit as string,
+      search as string | undefined,
+      parsedTags,
     );
     res.status(200).json({ success: true, journalEntries });
   } catch (error) {
