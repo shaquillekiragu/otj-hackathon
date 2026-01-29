@@ -76,7 +76,7 @@ const App = () => {
           />
 
           <div className="w-full lg:sticky lg:top-10 flex flex-col items-center lg:items-end">
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-4">
               <ProgressDiagram
                 onClick={() => setShowProgressModal(true)}
                 {...progressData}
@@ -110,7 +110,7 @@ const App = () => {
             onPreviousPage={goToPreviousPage}
           />
         </div>
-      </main>
+      </main >
     </>
   );
 };
