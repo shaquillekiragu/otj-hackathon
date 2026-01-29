@@ -272,7 +272,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
             onTagsUpdate={handleTagsUpdate}
             onTimesheetsUpdate={handleTimesheetsUpdate}
             timesheetEntries={editData?.timeSheets || []}
-            fetchTimesheets={async () => {}}
+            fetchTimesheets={async () => { }}
             totalPages={1}
             currentPage={1}
           />
@@ -291,7 +291,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
   }
 
   return (
-    <div
+    <section
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose}
     >
@@ -313,7 +313,7 @@ const Modal = ({ onClose, entryId }: ModalProps) => {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

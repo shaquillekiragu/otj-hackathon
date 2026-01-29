@@ -7,7 +7,7 @@ export default function ProgressStats(props: ProgressTrackerProps) {
 	const { actualOTJHours = 200, totalOTJHours = 400, hoursPerWeekExpected = 6, numberOfWeeksSinceStart = 40 } = props
 
 	return (
-		<div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-6">
+		<article className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-6">
 			<div className="flex flex-col gap-4 p-4 bg-gray-50 rounded-lg">
 				<h3 className="text-lg font-semibold text-gray-800 mb-2">Progress Indicators</h3>
 				<div className="flex flex-col gap-3">
@@ -64,6 +64,6 @@ export default function ProgressStats(props: ProgressTrackerProps) {
 					</div>
 				</div>
 			</div>
-		</div>
+		</article>
 	)
 }

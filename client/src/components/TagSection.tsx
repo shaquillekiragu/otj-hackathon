@@ -60,7 +60,7 @@ const TagSection = ({
   const showCreateOption = searchQuery.trim() && filteredTags.length === 0
 
   return (
-    <div className="mt-6">
+    <section className="mt-6">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">Tags</h3>
       <div className="flex flex-wrap gap-2">
         {selectedTags.map((tag) => (
@@ -172,7 +172,7 @@ const TagSection = ({
           </div>
         )}
       </div>
-    </div>
+    </section>
   )
 }
 

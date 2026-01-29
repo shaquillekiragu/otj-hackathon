@@ -48,7 +48,7 @@ const TimesheetEntryCard = ({
 
   if (isEditing) {
     return (
-      <div className="border border-blue-300 rounded-lg px-4 py-3 bg-blue-50">
+      <article className="border border-blue-300 rounded-lg px-4 py-3 bg-blue-50">
         <div className="flex items-center gap-4">
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-xs text-gray-500 font-medium">Date:</label>
@@ -106,12 +106,12 @@ const TimesheetEntryCard = ({
             </button>
           </div>
         </div>
-      </div>
+      </article>
     )
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 hover:bg-gray-100 transition-colors">
+    <article className="border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 hover:bg-gray-100 transition-colors">
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-1">
           <span className="text-xs text-gray-500 font-medium">Date:</span>
@@ -148,7 +148,7 @@ const TimesheetEntryCard = ({
           </button>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 

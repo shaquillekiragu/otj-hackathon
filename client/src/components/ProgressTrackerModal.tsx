@@ -21,7 +21,7 @@ export default function ProgressTrackerModal({
 	}, [])
 
 	return (
-		<div
+		<section
 			className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-50 p-4"
 			onClick={onClose}
 		>
@@ -50,6 +50,6 @@ export default function ProgressTrackerModal({
 					</section>
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }

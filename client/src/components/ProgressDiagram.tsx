@@ -27,7 +27,7 @@ export default function ProgressDiagram({
 	}
 
 	const diagramContent = (
-		<div className={`relative ${sizeClasses[size]}`}>
+		<article className={`relative ${sizeClasses[size]}`}>
 			<div className="absolute inset-0 rounded-full bg-gray-100 shadow-inner" />
 
 			<div
@@ -71,12 +71,12 @@ export default function ProgressDiagram({
 					</div>
 				</div>
 			</div>
-		</div>
+		</article>
 	)
 
 	if (onClick) {
 		return (
-			<div
+			<section
 				className="relative flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95"
 				onClick={onClick}
 				role="button"
@@ -90,7 +90,7 @@ export default function ProgressDiagram({
 				aria-label="View detailed progress tracker"
 			>
 				{diagramContent}
-			</div>
+			</section>
 		)
 	}
 

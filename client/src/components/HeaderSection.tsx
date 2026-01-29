@@ -5,7 +5,7 @@ import otjRequirements from '../assets/img/otj-requirements.png'
 
 export default function HeaderSection() {
 	return (
-		<div className="w-full">
+		<section className="w-full">
 			<div className="mb-6">
 				<div className="mb-6">
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 mb-3 tracking-tight leading-tight">
@@ -46,6 +46,6 @@ export default function HeaderSection() {
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }
