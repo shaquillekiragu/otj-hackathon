@@ -92,7 +92,7 @@ const App = () => {
         <div className="w-full max-w-5xl flex flex-col items-center gap-6">
           <button
             onClick={() => setShowModal(true)}
-            className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:translate-y-[-2px]"
+            className="px-12 py-3 bg-green-500 hover:bg-green-600 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:translate-y-[-2px]"
           >
             + Add OTJ Log
           </button>
